@@ -1,0 +1,38 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  --subtitle-text-clr: #808080;
+  --primary-clr: #F48023;
+  --primary-50-clr: #FCF4EC;
+  --white-clr: white;
+  --text-clr: #000;
+  --info-clr: #1682FD;
+}
+
+.subtitle-text {
+  @apply text-[var(--subtitle-text-clr)];
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  @apply text-[var(--text-clr)];
+}
+
+.background-white {
+  @apply bg-[var(--white-clr)];
+}
+
+.navbar-height {
+  @apply h-[84px];
+}
+
+.navbar-spacing {
+  @apply px-6;
+}
+
+.sidebar-spacing {
+  @apply pl-6;
+}
