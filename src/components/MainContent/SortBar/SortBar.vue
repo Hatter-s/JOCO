@@ -9,7 +9,7 @@
             top like
         </ButtonVue>
         <ButtonVue class="btn-neutral btn-sort">
-            <Comment />
+            <CommentIcon />
             top comments
         </ButtonVue>
     </div>

@@ -1,7 +1,7 @@
 <template>
-    <div>
-        This is Post vue!
-    </div>
+  <DefaultLayout>
+    <PostDetailContent />
+  </DefaultLayout>
 </template>
 
 <script setup lang="ts">

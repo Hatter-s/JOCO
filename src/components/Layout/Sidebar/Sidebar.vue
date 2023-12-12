@@ -35,12 +35,12 @@ import Logo from "@/assets/image/logo.svg";
 
 <style scoped>
 .link-active div {
-	@apply bg-[var(--primary-50-clr)] text-[var(--primary-clr)]
+	@apply bg-primary/10 text-primary
 }
 
 .link-active::before {
 	content: '';
-	@apply left-0 top-0 bottom-0 w-[5px] bg-[var(--primary-clr)] absolute;
+	@apply left-0 top-0 bottom-0 w-[5px] bg-primary absolute;
 }
 
 .sidebar-link {

@@ -21,7 +21,6 @@ module.exports = {
     {
       hattertheme: {
         "primary": "#F48023",
-        "primary/50": "#FCF4EC",
         "black": "#000",
         "white": "#FFF",
         "text": "#000",
