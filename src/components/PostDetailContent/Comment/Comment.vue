@@ -53,7 +53,7 @@ const toggleModal = () :void => {
 
 <style scoped>
 .comment {
-    @apply bg-white py-7 px-8 rounded-md shadow-md relative;
+    @apply bg-white py-7 px-8 rounded-md shadow-md relative my-5;
 }
 
 .comment::before {
