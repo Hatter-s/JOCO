@@ -1,14 +1,14 @@
 <template>
     <label for="search" class="subtitle-text background-white">
         <Search />
-        <input type="text" id="search" name="search" placeholder="Tìm kiếm" v-model="homeStore.$state.searchValue">
+        <input type="text" id="search" name="search" placeholder="Tìm kiếm">
     </label>
 </template>
 
 <script setup lang="ts">
-import { useHomeStore } from '@/stores';
+// import { useHomeStore } from '@/stores';
 
-const homeStore = useHomeStore();
+// const homeStore = useHomeStore();
 
 </script>
 

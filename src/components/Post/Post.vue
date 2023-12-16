@@ -1,59 +1,72 @@
 <script setup lang="ts">
 import Ava from "@/assets/image/users/Ava.jpeg";
-import { ref } from 'vue'
+import { ref } from 'vue';
+import { type Post } from '@/types/types';
+// import { usePostStore } from "@/stores";
 
 const props = defineProps<{
-    position: "in list" | "detail"
+    position: "in list" | "detail",
+    post: Post,
+    likePost: (id: number) => void,
+    dislikePost: (id: number) => void,
 }>();
 
-const showModal = ref<Boolean>(false);
+// const postStore = usePostStore()
+
+const showModal = ref<boolean>(false);
 const toggleModal = () :void => {    
     showModal.value = !showModal.value;
 }
+
 </script>
 
 <template>
-    <AddComment :handleToggle="toggleModal" :showModal="showModal" tagName="@Golanginya" />
-    <router-link :to="{ name: 'post'}">
-        <div class="post">
+    <AddComment 
+        :handleToggle="toggleModal" 
+        :showModal="showModal"
+        :commenter="post?.poster"
+        :parentId="null"
+        :post_id="post.post_id"
+    />
+    <router-link :to="{ name: 'post', params:{ id: post?.post_id.toString()}}">
+        <div class="post" :class="{'mb-4': position === 'in list'}">
             <More class="absolute right-7 top-8 text-secondary" />
             <div class="post-head">
                 <div class="poster">
-                    <img :src="Ava" alt="poster-image" class="h-[40px] w-[40px] rounded-full  aspect-square object-cover">
-                    <p class="poster-name">Golanginya</p>
-                    <p class="post-time">5 phút trước</p>
+                    <img :src="post.poster.ava_img" alt="poster-image" class="h-[40px] w-[40px] rounded-full  aspect-square object-cover">
+                    <p class="poster-name">
+                        {{ post.poster.tag_name }}
+                    </p>
+                    <p class="post-time">
+                        {{ post.create_time }}
+                    </p>
                 </div>
             </div>
             <div class="post-body">
-                <p class="title">How to patch KDE on FreeBSD?</p>
+                <p class="title">{{ post.title }}</p>
                 <p class="content">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat aliquet maecenas ut sit nulla
+                    {{ post.content }}
                 </p>
             </div>
             <div class="post-foot">
                 <div class="tag flex justify-between items-center gap-2">
-                    <ButtonVue class="btn-xs text-[10px] text-secondary rounded-md">
-                        golang
-                    </ButtonVue>
-                    <ButtonVue class="btn-xs text-[10px] text-secondary rounded-md">
-                        linux
-                    </ButtonVue>
-                    <ButtonVue class="btn-xs text-[10px] text-secondary rounded-md">
-                        overflow
+                    <ButtonVue class="btn-xs text-[10px] text-secondary rounded-md" v-for="tag in post.tags">
+                        {{ tag }}
                     </ButtonVue>
                 </div>
                 <div v-if="position === 'in list'" class="reaction flex justify-between items-center gap-4">
                     <ButtonVue class=" btn-disabled">
                         <Eye />
-                        125
+                        {{ post.views }}
                     </ButtonVue>
                     <ButtonVue class=" btn-disabled">
                         <CommentIcon />
-                        15
+                        {{ post.comments }}
                     </ButtonVue>
                     <ButtonVue>
-                        <Like />
-                        155
+                        <Like v-if="post.reaction.total > 0"/>
+                        <Dislike v-else />
+                        {{ post.reaction.total }}
                     </ButtonVue>
                 </div>
                 <div v-if="position === 'detail'" class="action-bar flex justify-between items-center gap-4">
@@ -61,13 +74,13 @@ const toggleModal = () :void => {
                         <CommentIcon />
                         Trả lời
                     </ButtonVue>
-                    <ButtonVue class="btn-info">
+                    <ButtonVue class="btn-info" :handleClick="[likePost, post?.post_id]">
                         <Like />
-                        14
+                        {{ post.reaction.like }}
                     </ButtonVue>
-                    <ButtonVue class="btn-secondary">
+                    <ButtonVue class="btn-secondary" :handleClick="[dislikePost, post?.post_id]">
                         <Dislike />
-                        5
+                        {{ post.reaction.dislike }}
                     </ButtonVue>
                 </div>
             </div>

@@ -1,12 +1,33 @@
 <template>
     <div class="post-detail-content navbar-spacing">
-        <Post position="detail"/>
+        <Post
+            v-if="postStore"
+            position="detail"
+            :post="currentPost!"
+            :likePost="postStore.likePost"
+            :dislikePost="postStore.dislikePost"
+        />
         <PosterInfo class="poster-info" />
         <Comments/>
     </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { usePostStore } from '@/stores';
+import { computed } from 'vue';
+import { useRoute} from "vue-router";
+
+const route = useRoute()
+
+
+const postStore = usePostStore();
+
+const currentPost = computed(() => {
+    if (!postStore.getPostById(Number(route.params.id))) return ;
+    return postStore.getPostById(Number(route.params.id));
+})
+
+</script>
 
 <style scoped>
 .post-detail-content {

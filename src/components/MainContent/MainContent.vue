@@ -2,7 +2,7 @@
     <div class="main-content navbar-spacing py-4">
         <SearchBar />
         <SortBar/>
-        <Post position="in list"/>
+        <Posts />
     </div>
 </template>
 
