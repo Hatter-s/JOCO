@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import accountRouter from './account.router'
+import { useAuthStore } from '@/stores'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +26,7 @@ const router = createRouter({
       name: 'post',
       component: () => import('../views/PostView.vue')
     },
+    { ...accountRouter }
   ],
   scrollBehavior(to, from, savedPosition) {
     // always scroll to top
@@ -33,5 +36,21 @@ const router = createRouter({
     }
   },
 })
+
+router.beforeEach(async (to) => {
+  // clear alert on route change
+  // const alertStore = useAlertStore();
+  // alertStore.clear();
+
+  // redirect to login page if not logged in and trying to access a restricted page 
+  const publicPages = ['/account/login', '/account/register'];
+  const authRequired = !publicPages.includes(to.path);
+  const authStore = useAuthStore();
+
+  if (authRequired && !authStore.user) {
+      authStore.returnUrl = to.fullPath;
+      return '/account/login';
+  }
+});
 
 export default router

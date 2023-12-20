@@ -1,7 +1,7 @@
 <template>
-<DefaultLayout>
-    This is user view
-</DefaultLayout>
+    <AccountLayout>
+        <router-view></router-view>
+    </AccountLayout>
 </template>
 
 <script setup lang="ts">

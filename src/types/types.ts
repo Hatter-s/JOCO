@@ -39,3 +39,10 @@ export interface Comment {
     parent_id: number| null;
     create_time: string;
 }
+
+export interface FakeUser extends User {
+    password: string;
+    username: string;
+    email: string;
+}
+

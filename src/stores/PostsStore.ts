@@ -4,22 +4,22 @@ import { data, comments  } from "@/data/data";
 import Ava from "@/assets/image/users/Ava.jpeg";
 
 const localStoragePosts: unknown =
-  JSON.parse(localStorage.getItem("posts")!) || [];
+  JSON.parse(localStorage.getItem("posts")!);
 
 const handleTypePosts: Post[] | [] = localStoragePosts as Post[] | [];
 
 const localStorageComments: unknown =
-  JSON.parse(localStorage.getItem("comments")!) || [];
+  JSON.parse(localStorage.getItem("comments")!);
 
 const handleTypeComments: Comment[] | [] = localStorageComments as Comment[] | [];
 
 const localStorageCountComment: number =
   Number(JSON.parse(localStorage.getItem("countComment")!)) || 3;
 
-export const usePostStore = defineStore("table", {
+export const usePostStore = defineStore("posts", {
   state: () => ({
-    posts: <Post[] | []> data,
-    comments: <Comment[] | []> comments,
+    posts: <Post[]> handleTypePosts || data,
+    comments: <Comment[]>  handleTypeComments || comments,
     countComment: <number> localStorageCountComment,
     // currentUser: <User/> currentUser,
   }),

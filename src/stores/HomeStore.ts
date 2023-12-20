@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-export const useHomeStore = defineStore("table", {
+export const useHomeStore = defineStore("home", {
   state: () => ({
     searchValue: undefined as String | undefined,
 

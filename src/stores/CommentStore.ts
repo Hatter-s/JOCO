@@ -7,7 +7,7 @@ const localStorageComments: unknown =
 
 const handleTypeComments: Comment[] | [] = localStorageComments as Comment[] | [];
 
-export const useCommentStore = defineStore("table", {
+export const useCommentStore = defineStore("comments", {
   state: () => ({
     comments: <Comment[] | []> comments,
   }),

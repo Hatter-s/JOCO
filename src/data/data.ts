@@ -1,4 +1,4 @@
-import type { Post, Comment, User } from "@/types/types";
+import type { Post, Comment, User, FakeUser } from "@/types/types";
 import Ava from "../assets/image/users/Ava.jpeg";
 import OldMan from "../assets/image/users/old-man.jpeg";
 
@@ -172,5 +172,32 @@ export const comments: Comment[] = [
         ],
         parent_id: null,
         create_time: '2023-12-13',
+    },
+]
+
+export const fakeUsers: FakeUser[] = [
+    {
+        user_id: 1, 
+        ava_img: Ava ,
+        tag_name: '@Golanginya',
+        password: 'ava123456',
+        username: 'Golanginya',
+        email: 'Golanginya@gmail.com'
+    },
+    {
+        user_id: 2, 
+        ava_img: OldMan ,
+        tag_name: '@morgenshtern',
+        password: 'oldman123456',
+        username: 'morgenshtern',
+        email: 'morgenshtern@hotmail.com'
+    },
+    {
+        user_id: 3, 
+        ava_img: OldMan ,
+        tag_name: '@lazyReplyer',
+        password: 'lazy123456',
+        username: 'lazyReplyer',
+        email: 'lazyReplyer@yahoo.com'
     },
 ]
