@@ -2,8 +2,15 @@
 import PlusCircle from "@/assets/image/icons/plus-circle.svg";
 
 import { useAuthStore } from "@/stores";
+import { useUsersStore } from "@/stores";
 
+const authStore = useAuthStore();
 const { logout } = useAuthStore();
+
+const showModal = ref<boolean>(false);
+const toggleModal = () :void => {    
+    showModal.value = !showModal.value;
+}
 </script>
 <template>
 	<nav class="bg-[var(--white-clr)] shadow-md navbar-spacing">
@@ -11,7 +18,7 @@ const { logout } = useAuthStore();
 			<p class="subtitle-text font-bold">Bài đăng</p>
 			<div class="flex gap-4">
 				<ButtonVue type="button"
-					class="py-3 px-5 flex gap-3 rounded bg-[var(--primary-clr)] btn-primary text-white items-center">
+					class="py-3 px-5 flex gap-3 rounded bg-[var(--primary-clr)] btn-primary text-white items-center" :handle-click="toggleModal">
 					<img :src="PlusCircle" alt="plus icon">
 					Đăng bài
 				</ButtonVue>
@@ -21,7 +28,16 @@ const { logout } = useAuthStore();
 				</ButtonVue>
 			</div>
 		</div>
+		<AddPost 
+			:handleToggle="toggleModal" 
+        	:showModal="showModal"
+        	:commenter="authStore.user"
+        	:parentId="1"
+        	:post_id="1"
+		/>
 	</nav>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

@@ -46,6 +46,7 @@ export const useUsersStore = defineStore('users',{
                 const authStore = useAuthStore();
                 authStore.user = user;
                 this.users = [...this.users , user];
+                this.saveUsers()
                 router.push(this.returnUrl || '/');
             }
 

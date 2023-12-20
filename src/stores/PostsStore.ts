@@ -39,7 +39,6 @@ export const usePostStore = defineStore("posts", {
 
 
 
-
     getTotalComment(state): Comment[] | [] {
       return state.comments;
     },
