@@ -1,4 +1,5 @@
 import './assets/main.css'
+import '@/assets/style/quill_editor.css'
 
 //Vue instance
 import { createApp } from 'vue'

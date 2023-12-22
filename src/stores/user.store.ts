@@ -2,66 +2,81 @@ import { defineStore } from 'pinia';
 import type { FakeUser } from '@/types/types';
 import { fakeUsers } from '@/data/data';
 import router from '@/router';
-import { useAuthStore } from '.';
+import PocketBase from 'pocketbase';
+import type { Register } from '@/types';
+import { register } from '@/api';
 
+interface RegisterUser {
+    username: string;
+    passwordConfirm: string;
+    password: string;
+    email: string;
+    emailVisibility: boolean,
+    name: string,
+    tag_name: string
+}
+
+const pb = new PocketBase('http://127.0.0.1:8090');
 const localStorageUsers: unknown =
-  JSON.parse(localStorage.getItem("users")!);
+    JSON.parse(localStorage.getItem("users")!);
 
 const handleTypeUsers: FakeUser[] | [] = localStorageUsers as FakeUser[] | [];
 
-export const useUsersStore = defineStore('users',{
+export const useUsersStore = defineStore('users', {
     state: () => ({
-        users: <FakeUser[]>  handleTypeUsers || fakeUsers,
-        error:  <{ where: string; message: string } | null> null,
-        returnUrl: <string | null> null
+        users: <FakeUser[]>handleTypeUsers || fakeUsers,
+        error: <any>null,
+        returnUrl: <string | null>null
     }),
     actions: {
         async saveUsers() {
-            localStorage.setItem("users",JSON.stringify(this.users))
+            localStorage.setItem("users", JSON.stringify(this.users))
         },
-        async register(user:FakeUser) {
-            const existUser = this.users.find(currUser => {
-                if(currUser.username === user.username) {
-                    this.error = {
-                        where: 'username',
-                        message: 'username is exist'
-                    }
-                    return true;
-                }
 
-                if(currUser.email === user.email) {
-                    this.error = {
-                        where: 'email',
-                        message: 'email is exist'
-                    }
-                    return true;
-                }
-
-                return false;
-                 
-            });
-
-            if(typeof existUser === 'undefined')
-            {
-                const authStore = useAuthStore();
-                authStore.user = user;
-                this.users = [...this.users , user];
-                this.saveUsers()
-                router.push(this.returnUrl || '/');
-            }
-
+        async register(user: RegisterUser) {
+            // const record = await register(user)
+            const record = await pb.collection('users').create(user)
+                .then(() => {
+                    this.error = null;
+                    router.push('./login');
+                })
+                .catch((err) => { this.error = err.response.data });
         },
+
         async getAll() {
 
         },
-        async getById(id:number) {
+
+        async getById(id: string) {
+            const record = await pb.collection('users').getOne(id, {
+                expand: 'relField1,relField2.subRelField',
+            });
+
+
+            // get only the first filename from "documents"
+            //
+            // note:
+            // "documents" is an array of filenames because
+            // the "documents" field was created with "Max Files" option > 1;
+            // if "Max Files" was 1, then the result property would be just a string
+            const firstFilename = record.avatar;
+
+            // returns something like:
+            // http://127.0.0.1:8090/api/files/example/kfzjt5oy8r34hvn/test_52iWbGinWd.png?thumb=100x250
+            const url = pb.files.getUrl(record, firstFilename, { 'thumb': '40x40' });
+
+            return {
+                user_id: record.id,
+                ava_img: url,
+                tag_name: record.tag_name
+            };
+        },
+
+        async updated(id: number, params: any) {
 
         },
-        async updated(id:number, params:any) {
 
-        },
-
-        async delete(id:number) {
+        async delete(id: number) {
 
         }
     }

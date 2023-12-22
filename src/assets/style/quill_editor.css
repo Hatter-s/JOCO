@@ -1,0 +1,13 @@
+.form-control .ql-toolbar.ql-snow {
+    @apply rounded-t-md border-secondary border-b-neutral;
+}
+
+.form-control .ql-container.ql-snow {
+    @apply border-secondary rounded-b-md;
+}
+
+
+
+.form-control .ql-container.ql-snow .ql-editor p {
+    @apply text-base;
+}

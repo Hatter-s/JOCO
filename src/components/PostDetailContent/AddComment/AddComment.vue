@@ -34,9 +34,9 @@ let content = ref<string>("");
 const props = defineProps<{
   handleToggle: any;
   showModal: boolean;
-  parentId: number | null;
+  parentId: string | null;
   commenter: User | undefined;
-  post_id: number;
+  post_id: string;
 }>();
 
 const handleAddComment = () => {

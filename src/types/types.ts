@@ -1,23 +1,23 @@
 export interface Reaction {
     like: number;
-    dislike: number;
+    dis_like: number;
     total: number;
 }
 
 export interface User {
-    user_id: number;
+    user_id: string;
     ava_img: string;
     tag_name: string;
 }
 
 export interface Post {
-    post_id: number;
+    post_id: string;
     poster: User;
     create_time: string;
     title: string;
     content: string
     reaction: Reaction;
-    tags: string[];
+    tags: string;
     views: number;
     comments: number;
 }
@@ -41,8 +41,15 @@ export interface Comment {
 }
 
 export interface FakeUser extends User {
-    password: string;
     username: string;
-    email: string;
 }
 
+export interface PostCreate {
+    poster: string,
+    title: string,
+    content: string,
+    views: number
+    comments: number,
+    reaction: string,
+    tags: string
+}

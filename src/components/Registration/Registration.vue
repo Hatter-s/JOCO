@@ -6,8 +6,8 @@
                 <div class="form-control">
                     <label for="user_name">
                         Tên đăng nhập
-                        <span v-if="error?.where === 'username'" class="error">
-                            {{ error.message }}
+                        <span v-if="error?.username" class="error">
+                            {{ error?.username?.message }}
                         </span>
                     </label>
                     <input type="text" name="user_name" id="user_name" placeholder="ex: JohnDoe" v-model="username">
@@ -16,8 +16,8 @@
                 <div class="form-control">
                     <label for="email">
                         Email
-                        <span v-if="error?.where === 'email'" class="error">
-                            {{ error.message }}
+                        <span v-if="error?.email" class="error">
+                            {{ error?.email?.message }}
                         </span>
                     </label>
                     <input type="email" name="email" id="email" placeholder="ex: JohnDoe@gmail.com" v-model="email">
@@ -27,6 +27,9 @@
                 <div class="form-control">
                     <label for="password">
                         Mật khẩu
+                        <span v-if="error?.password" class="error">
+                            {{ error?.password?.message }}
+                        </span>
                     </label>
                     <div class="relative">
                         <input :type="viewPassword ? 'text' : 'password'" name="password" id="password" v-model="password">
@@ -42,8 +45,8 @@
                 <div class="form-control">
                     <label for="re-password">
                         Nhập lại mật khẩu
-                        <span v-if="error?.where === 're-password'" class="error">
-                            {{ error.message }}
+                        <span v-if="error?.passwordConfirm === 're-password'" class="error">
+                            {{ error?.passwordConfirm.message }}
                         </span>
                     </label>
                     <div class="relative">
@@ -84,24 +87,15 @@ const repeatPassword = ref<string>('');
 const handleSubmit = (e: Event) => {
     e.preventDefault();
 
-    if (password.value !== repeatPassword.value) {
-        console.log('run!');
-        
-        error.value = {
-            message: "repeat password don't match",
-            where: "repeat password"
-        }
-
-        return false;
-    }
     userStore.register(
         {
+            tag_name: `@ ${username.value}`,
+            name: username.value,
             username: username.value,
             password: password.value,
+            passwordConfirm: repeatPassword.value,
             email: email.value,
-            user_id: 1,
-            ava_img: '',
-            tag_name: `@${username.value}`
+            "emailVisibility": true,
         }
     )
 
@@ -119,7 +113,11 @@ const toggleViewPassword = () => {
 }
 
 .form-control label {
-    @apply text-xl font-semibold;
+    @apply text-xl font-semibold flex justify-between items-end;
+}
+
+.form-control label span.error {
+    @apply text-sm text-error;
 }
 
 .form-control input:not([type=submit]) {

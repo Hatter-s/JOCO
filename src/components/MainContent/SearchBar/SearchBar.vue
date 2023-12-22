@@ -1,15 +1,22 @@
 <template>
     <label for="search" class="subtitle-text background-white">
-        <Search />
-        <input type="text" id="search" name="search" placeholder="Tìm kiếm">
+        <ButtonVue class="btn-sm px-0 h-auto btn-ghost" :handle-click="handleSearch">
+            <Search />
+        </ButtonVue>
+
+        <input type="text" id="search" name="search" placeholder="Tìm kiếm" v-model="searchText">
     </label>
 </template>
 
 <script setup lang="ts">
-// import { useHomeStore } from '@/stores';
+import { usePostStore  } from '@/stores';
 
-// const homeStore = useHomeStore();
+const postStore = usePostStore();
+const searchText = ref<string>('');
 
+const handleSearch = async () => {
+    await postStore.searchPost(searchText.value);
+}
 </script>
 
 <style scoped>

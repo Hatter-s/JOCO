@@ -10,7 +10,7 @@
                 <div class="form-control">
                     <label for="user_name">
                         Tên đăng nhập
-                        <span v-if="error?.where === 'user_name'" class="error">
+                        <span v-if="error?.where === 'true'" class="error">
                             {{ error.message }}
                         </span>
                     </label>
@@ -20,7 +20,7 @@
                 <div class="form-control">
                     <label for="password">
                         Mật khẩu
-                        <span v-if="error?.where === 'password'" class="error">
+                        <span v-if="error?.where === 'true'" class="error">
                             {{ error.message }}
                         </span>
                     </label>
@@ -60,9 +60,9 @@ const authStore = useAuthStore();
 const login = authStore.login;
 const { error } = storeToRefs(authStore);
 
-const handleSubmit = (e: Event) => {
+const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    login(username.value, password.value);
+    await login(username.value, password.value);
 }
 
 const toggleViewPassword = () => {

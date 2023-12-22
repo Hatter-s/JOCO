@@ -1,5 +1,5 @@
 <template>
-    <div class="post-detail-content navbar-spacing">
+    <div class="post-detail-content navbar-spacing" v-if="currentPost">
         <Post
             v-if="postStore"
             position="detail"
@@ -14,18 +14,21 @@
 
 <script setup lang="ts">
 import { usePostStore } from '@/stores';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRoute} from "vue-router";
+import { storeToRefs } from "pinia";
 
-const route = useRoute()
+const route = useRoute();
 
+onMounted(() => {
+    if(typeof route.params.id === 'string') {
+        postStore.getPostById(route.params.id);
+    }
+})
 
 const postStore = usePostStore();
 
-const currentPost = computed(() => {
-    if (!postStore.getPostById(Number(route.params.id))) return ;
-    return postStore.getPostById(Number(route.params.id));
-})
+const { currentPost } = storeToRefs(postStore);
 
 </script>
 

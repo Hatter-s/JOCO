@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Ava from "@/assets/image/users/Ava.jpeg";
 import { ref } from 'vue';
-import { type Post } from '@/types/types';
+import  type { Post } from '@/types/types';
+
 // import { usePostStore } from "@/stores";
 
 const props = defineProps<{
@@ -25,10 +25,10 @@ const toggleModal = () :void => {
         :handleToggle="toggleModal" 
         :showModal="showModal"
         :commenter="post?.poster"
-        :parentId="null"
+        parentId= "this"
         :post_id="post.post_id"
     />
-    <router-link :to="{ name: 'post', params:{ id: post?.post_id.toString()}}">
+    <router-link :to="{ name: 'post', params:{ id: post?.post_id}}">
         <div class="post" :class="{'mb-4': position === 'in list'}">
             <More class="absolute right-7 top-8 text-secondary" />
             <div class="post-head">
@@ -44,13 +44,12 @@ const toggleModal = () :void => {
             </div>
             <div class="post-body">
                 <p class="title">{{ post.title }}</p>
-                <p class="content">
-                    {{ post.content }}
+                <p class="content" v-html="post.content">
                 </p>
             </div>
             <div class="post-foot">
                 <div class="tag flex justify-between items-center gap-2">
-                    <ButtonVue class="btn-xs text-[10px] text-secondary rounded-md" v-for="tag in post.tags">
+                    <ButtonVue class="btn-xs text-[10px] text-secondary rounded-md" v-for="tag in post.tags.split(' ')">
                         {{ tag }}
                     </ButtonVue>
                 </div>
@@ -80,7 +79,7 @@ const toggleModal = () :void => {
                     </ButtonVue>
                     <ButtonVue class="btn-secondary" :handleClick="[dislikePost, post?.post_id]">
                         <Dislike />
-                        {{ post.reaction.dislike }}
+                        {{ post.reaction.dis_like }}
                     </ButtonVue>
                 </div>
             </div>

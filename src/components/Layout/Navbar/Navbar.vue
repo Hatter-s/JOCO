@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import PlusCircle from "@/assets/image/icons/plus-circle.svg";
-
+import { useRoute } from "vue-router";
 import { useAuthStore } from "@/stores";
-import { useUsersStore } from "@/stores";
+import { usePostStore } from "@/stores";
 
+const route = useRoute();
+
+const postStore = usePostStore();
 const authStore = useAuthStore();
 const { logout } = useAuthStore();
 
@@ -11,6 +14,8 @@ const showModal = ref<boolean>(false);
 const toggleModal = () :void => {    
     showModal.value = !showModal.value;
 }
+
+
 </script>
 <template>
 	<nav class="bg-[var(--white-clr)] shadow-md navbar-spacing">
@@ -31,9 +36,7 @@ const toggleModal = () :void => {
 		<AddPost 
 			:handleToggle="toggleModal" 
         	:showModal="showModal"
-        	:commenter="authStore.user"
-        	:parentId="1"
-        	:post_id="1"
+        	:posterID="authStore.user?.user_id"
 		/>
 	</nav>
 </template>

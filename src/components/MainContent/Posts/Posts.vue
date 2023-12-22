@@ -13,7 +13,11 @@
 <script setup lang="ts">
 import { usePostStore } from '@/stores';
 import { storeToRefs  } from 'pinia';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
+
+onMounted(() => {
+    postStore.getAllPost()
+})
 
 const postStore = usePostStore();
 const { posts } = storeToRefs(postStore);

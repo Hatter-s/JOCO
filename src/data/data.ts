@@ -24,11 +24,7 @@ export const data: Post[] = [
             dislike: 5,
             total: 9,
         },
-        tags: [
-            'healthy',
-            'food',
-            'education'
-        ],
+        tags: 'healthy,food, education',
         views: 125,
         comments: 15,
     },
@@ -47,11 +43,7 @@ export const data: Post[] = [
             dislike: 10,
             total: 14,
         },
-        tags: [
-            'healthy',
-            'food',
-            'education'
-        ],
+        tags: 'healthy,food, education',
         views: 100,
         comments: 25,
     },
@@ -70,11 +62,7 @@ export const data: Post[] = [
             dislike: 4,
             total: 16,
         },
-        tags: [
-            'healthy',
-            'food',
-            'education'
-        ],
+        tags: 'healthy,food, education',
         views: 25,
         comments: 1,
     },
@@ -93,11 +81,7 @@ export const data: Post[] = [
             dislike: 5,
             total: 9,
         },
-        tags: [
-            'healthy',
-            'food',
-            'education'
-        ],
+        tags: 'healthy,food, education',
         views: 125,
         comments: 15,
     },
@@ -180,24 +164,24 @@ export const fakeUsers: FakeUser[] = [
         user_id: 1, 
         ava_img: Ava ,
         tag_name: '@Golanginya',
-        password: 'ava123456',
+        // password: 'ava123456',
         username: 'Golanginya',
-        email: 'Golanginya@gmail.com'
+        // email: 'Golanginya@gmail.com'
     },
     {
         user_id: 2, 
         ava_img: OldMan ,
         tag_name: '@morgenshtern',
-        password: 'oldman123456',
+        // password: 'oldman123456',
         username: 'morgenshtern',
-        email: 'morgenshtern@hotmail.com'
+        // email: 'morgenshtern@hotmail.com'
     },
     {
         user_id: 3, 
         ava_img: OldMan ,
         tag_name: '@lazyReplyer',
-        password: 'lazy123456',
+        // password: 'lazy123456',
         username: 'lazyReplyer',
-        email: 'lazyReplyer@yahoo.com'
+        // email: 'lazyReplyer@yahoo.com'
     },
 ]

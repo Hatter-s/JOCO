@@ -1,6 +1,6 @@
 <template>
 <DefaultLayout>
-    This is user view
+    <UserContainer />
 </DefaultLayout>
 </template>
 
