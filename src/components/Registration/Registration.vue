@@ -89,13 +89,10 @@ const handleSubmit = (e: Event) => {
 
     userStore.register(
         {
-            tag_name: `@ ${username.value}`,
-            name: username.value,
             username: username.value,
             password: password.value,
-            passwordConfirm: repeatPassword.value,
+            repeatPassword: repeatPassword.value,
             email: email.value,
-            "emailVisibility": true,
         }
     )
 

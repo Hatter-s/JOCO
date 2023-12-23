@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import  type { Post } from '@/types/types';
+import  type { Post } from '@/types';
 
 // import { usePostStore } from "@/stores";
 

@@ -1,7 +1,9 @@
 import { defineStore } from "pinia";
-import type { Post, Comment, SubComment, PostCreate } from "../types/types";
+import type { Comment, SubComment, PostCreate } from "../types/types";
+import type { EditedPost, Post, DeletedPost, AddedPost  } from "@/types/post.type";
 import { data, comments } from "@/data/data";
-import { useUsersStore } from ".";
+import { addPost, deletePost, editPost, getListPost, getPostsByTagId, getPostsByUserId } from "@/api";
+import { useUsersStore, useAlertStore } from ".";
 import PocketBase from 'pocketbase';
 
 const pb = new PocketBase('http://127.0.0.1:8090');
@@ -34,7 +36,6 @@ export const usePostStore = defineStore("posts", {
       return state.posts.length;
     },
 
-
     getTotalComment(state): Comment[] | [] {
       return state.comments;
     },
@@ -49,6 +50,10 @@ export const usePostStore = defineStore("posts", {
   },
 
   actions: {
+    savePosts() {
+      localStorage.setItem("posts", JSON.stringify(this.posts));
+    },
+
     async getPostById(postID: string) {
       const userStore = useUsersStore();
 
@@ -80,8 +85,8 @@ export const usePostStore = defineStore("posts", {
       }).then(res => ({ dis_like: res.dis_like, like: res.like, total: res.like - res.dis_like }));
     },
 
-    savePosts() {
-      localStorage.setItem("posts", JSON.stringify(this.posts));
+    async getListPost(pageNo:number, pageSize:number) {
+      const record = await getListPost(pageNo, pageSize);
     },
 
     async getAllPost() {
@@ -116,15 +121,37 @@ export const usePostStore = defineStore("posts", {
       }
     },
 
-    async addPost(data: PostCreate) {
-      try {
-        const record = await pb.collection('posts').create(data);
+    async getPostByUserId(userId:number, pageNo:number, pageSize:number) {
+      const record = await getPostsByUserId(userId, pageNo, pageSize);
 
-        await this.getAllPost();
+    },
+
+    async getPostByTagId(tagId:number, pageNo:number, pageSizeNumber:number) {
+      const record = await getPostsByTagId(tagId, pageNo, pageSizeNumber);
+    },
+
+    async addPost(data: AddedPost) {
+      const alertStore = useAlertStore(); 
+      try {
+        const record = await addPost(data);
+        const status = record?.data.status;
+        if (status === 200) {
+          alertStore.success(record?.data.response);
+          
+          await this.getAllPost();
+      } else if (status === 400) {
+          alertStore.error(record?.data.message);
+
+      }
+
       } catch (err) {
         console.error(err);
 
       }
+    },
+
+    async editPost(data: EditedPost) {
+      const record = await editPost(data);
     },
 
     async createReaction(name: string) {
@@ -138,11 +165,13 @@ export const usePostStore = defineStore("posts", {
 
       return record.id
     },
-    deletePosts(postId: Number) {
+    async deletePosts(data: DeletedPost) {
+      const record = await deletePost(data);
 
-
-      this.savePosts();
     },
+
+
+
     likePost(postId: Number) {
 
 
@@ -211,10 +240,8 @@ export const usePostStore = defineStore("posts", {
       this.saveComments();
     },
 
-    deleteComments(commentId: Number) {
-      this.comments = this.comments.filter((comment) => comment.comment_id === commentId);
+    async deleteComments(commentId: Number) {
 
-      this.saveComments();
     },
 
     likeComment(commentId: Number) {

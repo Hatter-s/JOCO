@@ -1,8 +1,14 @@
 export interface User {
-    user_id: string;
-    ava_img: string;
-    tag_name: string;
+    id: number;
+    username:string
+    avatarAddress: string;
+    tagName: string;
 }
+
+export interface UserLoginData extends User {
+    email:string
+}
+
 
 export interface Login {
     username:string;

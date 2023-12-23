@@ -1,11 +1,7 @@
 import { defineStore } from "pinia";
-import { type Comment } from "../types/types";
 import { comments } from "@/data/data";
-
-const localStorageComments: unknown =
-  JSON.parse(localStorage.getItem("comments")!) || [];
-
-const handleTypeComments: Comment[] | [] = localStorageComments as Comment[] | [];
+import type { DeletedComment, AddedComment, ChangedComment } from "@/types";
+import { addComment, deleteComment, getCommentsByPostId } from "@/api";
 
 export const useCommentStore = defineStore("comments", {
   state: () => ({
@@ -13,29 +9,46 @@ export const useCommentStore = defineStore("comments", {
   }),
 
   getters: {
-    getTotalComment(state): Comment[] | [] {
-      return state.comments;
-    },
-    countTotalComment(state): Number {
-      return state.comments.length;
-    },
-    getCommentById(state) {
-      return (commentId: Number): Comment | undefined => {
-        return state.comments.find((comment) => comment.comment_id === commentId);
-      };
-    },
+
   },
 
   actions: {
-    saveComments() {
-      localStorage.setItem("comments", JSON.stringify(this.comments));
+    async addComments(data:AddedComment) {
+      try {
+        const record = addComment(data);
+      } catch (error) {
+        console.log(error);
+        
+      }
     },
 
-    deleteComments(commentId: Number) {
-      this.comments = this.comments.filter((comment) => comment.comment_id === commentId);
-
-      this.saveComments();
+    async changeComments(data:ChangedComment) {
+      try {
+        const record = addComment(data);
+      } catch (error) {
+        console.log(error);
+        
+      }
     },
+
+    async deleteComments(data:DeletedComment) {
+      try {
+        const record = deleteComment(data);
+      } catch (error) {
+        console.log(error);
+        
+      }
+    },
+
+    async getCommentsByPostId(postId:number, pageNo:number, pageSize:number) {
+      try {
+        const record = getCommentsByPostId(postId, pageNo, pageSize);
+      } catch (error) {
+        console.log(error);
+        
+      }
+    },
+
     likeComment(commentId: Number) {
       this.comments = this.comments.map((comment) => {
         if (comment.comment_id === commentId) {

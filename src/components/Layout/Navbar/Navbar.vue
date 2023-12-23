@@ -36,7 +36,7 @@ const toggleModal = () :void => {
 		<AddPost 
 			:handleToggle="toggleModal" 
         	:showModal="showModal"
-        	:posterID="authStore.user?.user_id"
+        	:user="authStore.user"
 		/>
 	</nav>
 </template>

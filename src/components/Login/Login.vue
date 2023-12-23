@@ -10,22 +10,16 @@
                 <div class="form-control">
                     <label for="user_name">
                         Tên đăng nhập
-                        <span v-if="error?.where === 'true'" class="error">
-                            {{ error.message }}
-                        </span>
                     </label>
-                    <input type="text" name="user_name" id="user_name" placeholder="ex: JohnDoe" v-model="username" :class="{error: error?.where === 'user_name'}">
+                    <input type="text" name="user_name" id="user_name" placeholder="ex: JohnDoe" v-model="username" :class="{error: error}">
                 </div>
 
                 <div class="form-control">
                     <label for="password">
                         Mật khẩu
-                        <span v-if="error?.where === 'true'" class="error">
-                            {{ error.message }}
-                        </span>
                     </label>
                     <div class="relative">
-                        <input :type="viewPassword ? 'text' : 'password'" name="password" id="password" v-model="password" :class="{error: error?.where === 'password'}">
+                        <input :type="viewPassword ? 'text' : 'password'" name="password" id="password" v-model="password" :class="{error: error}">
                         <ButtonVue
                             class="btn btn-ghost btn-xs absolute top-1/2 -translate-y-1/2 right-0 hover:bg-transparent"
                             :handle-click="toggleViewPassword">

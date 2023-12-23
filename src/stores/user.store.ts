@@ -5,6 +5,7 @@ import router from '@/router';
 import PocketBase from 'pocketbase';
 import type { Register } from '@/types';
 import { register } from '@/api';
+import { useAlertStore } from '.';
 
 interface RegisterUser {
     username: string;
@@ -33,14 +34,29 @@ export const useUsersStore = defineStore('users', {
             localStorage.setItem("users", JSON.stringify(this.users))
         },
 
-        async register(user: RegisterUser) {
-            // const record = await register(user)
-            const record = await pb.collection('users').create(user)
-                .then(() => {
+        async register(user: Register) {
+            const alertStore = useAlertStore();
+
+            try {
+                const record = await register(user)
+
+                const status  = record?.data.status;
+    
+                if (status === 200) {
                     this.error = null;
                     router.push('./login');
-                })
-                .catch((err) => { this.error = err.response.data });
+                    alertStore.success(record?.data.response);
+
+                } else if (status === 400) {
+                    alertStore.error(record?.data.message);
+
+                }
+                
+            } catch (error) {
+                console.error(error);
+                
+            }
+
         },
 
         async getAll() {

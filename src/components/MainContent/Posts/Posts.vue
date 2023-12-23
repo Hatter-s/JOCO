@@ -16,7 +16,8 @@ import { storeToRefs  } from 'pinia';
 import { computed, onMounted } from 'vue';
 
 onMounted(() => {
-    postStore.getAllPost()
+    // postStore.getAllPost()
+    postStore.getListPost(1, 50);
 })
 
 const postStore = usePostStore();

@@ -3,7 +3,8 @@
 </script>
 
 <template>
-    <div>
+    <div class="relative">
+      <Alert/>
       <RouterView />
     </div>
 </template>

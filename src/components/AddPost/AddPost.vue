@@ -14,10 +14,19 @@
                     <label for="content">
                         Content
                     </label>
-                    <QuillEditor theme="snow" toolbar="full" v-model:content="content" contentType="html" />
+                    <QuillEditor 
+                    theme="snow" 
+                    toolbar="full" v-model:content="content" contentType="html" 
+                    :modules="contentModules"
+                    />
                 </div>
 
-
+                <div class="form-control mb-4">
+                    <label for="tags">
+                        Tags
+                    </label>
+                    <input type="text" id="tags" name="tags" v-model="tags" class="input input-secondary w-full">
+                </div>
 
                 <div class="flex gap-3 justify-end">
                     <ButtonVue class="btn btn-sm" :handleClick="handleToggle">Close</ButtonVue>
@@ -25,33 +34,61 @@
                         Tao post
                     </ButtonVue>
                 </div>
-
-
             </form>
         </div>
     </dialog>
 </template>
   
 <script setup lang="ts">
-import type { User, PostCreate } from "@/types/types";
-import { ref } from "vue";
-import { usePostStore } from "@/stores";
-import { storeToRefs } from "pinia";
+import ImageUploader from "quill-image-uploader";
+import 'quill-image-uploader/dist/quill.imageUploader.min.css';
 
+import { ref } from "vue";
+import { usePostStore, useAlertStore } from "@/stores";
+import { storeToRefs } from "pinia";
+import { uploadFile } from "@/api";
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import '@vueup/vue-quill/dist/vue-quill.bubble.css';
+import type { AddedPost, User } from "@/types";
+import axios from "axios";
+
+
+const contentModules = {
+        name: 'imageUploader',
+        module: ImageUploader,
+        options: {
+          upload: (file:File) => {
+            return new Promise((resolve, reject) => {
+              const formData = new FormData();
+              formData.append("file", file);
+                
+            
+              axios.post('http://127.0.0.1:6615/health_care_application/api/v1/upload', formData)
+              .then(res => {
+                console.log(res)
+                resolve(res => `file:///C:\${res.data.data}`);
+              })
+              .catch(err => {
+                reject("Upload failed");
+                console.error("Error:", err)
+              })
+            })
+          }
+        }
+}
 
 
 const postStore = usePostStore();
+const alertStore = useAlertStore();
 
 let content = ref();
 let title = ref<string>('');
+let tags = ref<string>('');
 
 const props = defineProps<{
     handleToggle: any;
     showModal: boolean;
-    posterID: string | undefined;
+    user: User | null;
 }>();
 
 
@@ -59,19 +96,17 @@ const props = defineProps<{
 let handleSubmit = async (e: Event) => {
     try {
         e.preventDefault();
-    
-        if (props.posterID) {
+
+        if(props.user === null) {
             return false;
         }
-        const reactionID = await postStore.createReaction(title.value);
-        const data: PostCreate = {
-            "poster": props.posterID!,
-            "title": title.value,
-            "content": content.value,
-            "views": 0,
-            "comments": 0,
-            "reaction": reactionID,
-            "tags": ""
+        // const reactionID = await postStore.createReaction(title.value);
+        const data: AddedPost = {
+            userId : props.user.id,
+            userName: props.user.username,
+            title: title.value,
+            content: content.value,
+            tags: tags.value
         };
 
         await postStore.addPost(data)

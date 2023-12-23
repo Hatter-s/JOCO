@@ -36,7 +36,7 @@ const props = defineProps<{
   showModal: boolean;
   parentId: string | null;
   commenter: User | undefined;
-  post_id: string;
+  post_id: number;
 }>();
 
 const handleAddComment = () => {

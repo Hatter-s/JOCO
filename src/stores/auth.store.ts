@@ -4,6 +4,8 @@ import router from '@/router';
 import {login} from '@/api';
 import PocketBase from 'pocketbase';
 import { data } from "@/data/data";
+import type { UserLoginData, User } from "@/types";
+import { useAlertStore } from ".";
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 
@@ -15,51 +17,47 @@ const handleTypeUser: FakeUser | null = localStorageUser as
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    user: <FakeUser | null> handleTypeUser,
-    error: <{ where: string | undefined; message: string | undefined; code:string | undefined } | null>null,
+    user: <User | null> handleTypeUser,
+    error:<boolean> false,
     returnUrl: <string | null>null
   }),
   actions: {
     async login(username: string, password: string) {
       try {
-        const authData = await pb.collection('users').authWithPassword(
-          username,
-          password,
-      );;
+        const alertStore = useAlertStore();
+        const authData = await login(username, password);
+        const status = authData?.data.status;
 
-        const user = pb.authStore.model!;
-
-        // update pinia state
-        
-        this.user = {
-          user_id: user.id,
-          username: user.username,
-          ava_img: user.avatar,
-          tag_name: user.tag_name,
+        if(status === 200) {
+          const user:UserLoginData = authData?.data.data;
+          
+          // update pinia state
+          this.user = {
+            id: user.id,
+            username: user.username,
+            avatarAddress: user.avatarAddress,
+            tagName: user.tagName,
+          }
+  
+          // store user details and jwt in local storage to keep user logged in between page refreshes
+          localStorage.setItem('user', JSON.stringify({
+            id: user.id,
+            username: user.username,
+            avatarAddress: user.avatarAddress,
+            tagName: user.tagName,
+          }));
+  
+          // redirect to previous url or default to home page
+          router.push('/');
+        } else if ( status === 400) {
+          this.error = true
+          alertStore.error(authData?.data.message);
         }
 
-
-
-        // this.user = user;
-
-        // store user details and jwt in local storage to keep user logged in between page refreshes
-        localStorage.setItem('user', JSON.stringify({
-          user_id: user.id,
-          username: user.username,
-          ava_img: user.avatar,
-          tag_name: user.tag_name,
-        }));
-
-        // redirect to previous url or default to home page
-        router.push('/');
       } catch (error) {
         
         const handleTypeError:Error  = error as Error
-        this.error = {
-          where: 'true',
-          code: '',
-          message: 'Invalid username or password'
-        }
+        
       }
     },
 
