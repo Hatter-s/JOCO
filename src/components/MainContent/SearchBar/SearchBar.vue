@@ -15,7 +15,7 @@ const postStore = usePostStore();
 const searchText = ref<string>('');
 
 const handleSearch = async () => {
-    await postStore.searchPost(searchText.value);
+    await postStore.searchPost(searchText.value, 0 ,50);
 }
 </script>
 

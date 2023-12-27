@@ -4,7 +4,8 @@ import type { EditedPost, DeletedPost, AddedPost } from "@/types";
 const POST_URL = import.meta.env.VITE_BACKEND_URL + '/post';
 const UPLOAD_URL = import.meta.env.VITE_BACKEND_URL +'/upload';
 
-export const getListPost = async (pageNo:number, pageSize:number) => {
+//pageNo start at 0
+export const getListPost = async (pageNo:number, pageSize:number) => {                                      
     return await axios({
         method: 'GET',
         url: POST_URL,
@@ -28,11 +29,18 @@ export const deletePost = async (data:DeletedPost) => {
     })
 }
 
+export const getPostByPostId = async (postId:number) => {
+    return axios({
+        method: 'GET',
+        url: POST_URL + `/${postId}`,
+    })
+}
+
 export const getPostsByUserId = async (userId: number, pageNo: number, pageSize: number) => {
     return await axios({
         method: 'GET',
-        url: POST_URL + `user/${userId}`,
-        params: {pageNo, pageSize}
+        url: POST_URL + `/user/${userId}`,
+        params: { pageNo, pageSize}
     })
 }
 
@@ -52,10 +60,31 @@ export const addPost = async (data: AddedPost) => {
     }) 
 }
 
-export const uploadFile = async (file: File) => {
+export const searchPost = async (keyword: string, pageNo: number, pageSize: number) => {
+    return await axios({
+        method: 'GET',
+        url: POST_URL + '/search',
+        params: { keyword, pageNo, pageSize }
+    })
+}
+
+export const uploadFile = async (formData: FormData) => {
+    return await axios.post(UPLOAD_URL, formData);
+}
+
+export const getFileURL = async (path: string) => {
+    return await axios({
+        method: 'GET',
+        url: UPLOAD_URL,
+        params: { path }
+    }).then(res => res);
+}
+
+export const increaseLookTime = async (postId: number) => {
     return await axios({
         method: 'POST',
-        url: UPLOAD_URL,
-        params: {file }
-    }) 
+        url: POST_URL + '/increase-look-time',
+        params: {postId}
+    })
+
 }

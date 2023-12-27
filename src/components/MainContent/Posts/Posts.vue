@@ -4,8 +4,6 @@
             v-for="post in postsList"
             :post="post" 
             position="in list"
-            :likePost="postStore.likePost"
-            :dislikePost="postStore.dislikePost"
         />
     </div>
 </template>
@@ -14,10 +12,16 @@
 import { usePostStore } from '@/stores';
 import { storeToRefs  } from 'pinia';
 import { computed, onMounted } from 'vue';
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 onMounted(() => {
-    // postStore.getAllPost()
-    postStore.getListPost(1, 50);
+    if(route.params.id) {
+        postStore.getPostsByUserId(Number(route.params.id), 0 ,50)
+    }   else {
+        postStore.getListPost(0, 50);
+    }
 })
 
 const postStore = usePostStore();

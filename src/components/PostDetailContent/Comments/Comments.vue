@@ -1,12 +1,13 @@
 <template>
     <div>
         <p class="text-center text-info text-2xl my-5">Câu trả lời</p>
-        <Comment 
-            v-for="comment in getPostComments"
+        <div v-if="comments">
+            <Comment 
+            v-for="comment in comments"
             :comment="comment"
-            :likeComment="commentStore.likeComment"
-            :dislikeComment="commentStore.dislikeComment"
         />
+        </div>
+
 
 
         <!-- <Comment v-if="seeMore"/>
@@ -17,48 +18,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { usePostStore } from '@/stores';
+import { computed } from 'vue';
+import { useCommentStore } from '@/stores';
 import { storeToRefs } from 'pinia';
-import { useRoute} from "vue-router";
+import { useRoute } from "vue-router";
+
+onMounted(() => {
+    commentStore.getCommentsByPostId(props.postId, 0, 50); 
+})
+
+const props = defineProps<{
+    postId: number
+}>()
 
 const route = useRoute()
-const postId = route.params.id;
-
-const commentStore = usePostStore();
+const commentStore = useCommentStore();
 const { comments } = storeToRefs(commentStore);
 
-const getPostComments = computed(() => {
-    const postComment = comments.value.filter((comment) => comment.post_id === Number(postId));
-
-        
-    return postComment.sort((a, b) => {
-        let DateA = new Date(a.create_time);
-        let DateB = new Date(b.create_time);
-
-        if( DateA.getTime() > DateB.getTime()){
-            return 1;
-        }else if( DateA.getTime() < DateB.getTime() ) {
-            return -1;
-        }
-        return 0;
-    })
-})
-
-const sortByTime = computed(() => {
+// const sortByTime = computed(() => {
     
-    return comments.value.sort((a, b) => {
-        let DateA = new Date(a.create_time);
-        let DateB = new Date(b.create_time);
+//     return comments.value.sort((a, b) => {
+//         let DateA = new Date(a.create_time);
+//         let DateB = new Date(b.create_time);
 
-        if( DateA.getTime() > DateB.getTime()){
-            return 1;
-        }else if( DateA.getTime() < DateB.getTime() ) {
-            return -1;
-        }
-        return 0;
-    })
-})
+//         if( DateA.getTime() > DateB.getTime()){
+//             return 1;
+//         }else if( DateA.getTime() < DateB.getTime() ) {
+//             return -1;
+//         }
+//         return 0;
+//     })
+// })
 const seeMore = ref<Boolean>(false);
 
 const handleSeeMore = () => {

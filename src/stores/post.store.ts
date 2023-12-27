@@ -1,148 +1,172 @@
 import { defineStore } from "pinia";
-import type { Comment, SubComment, PostCreate } from "../types/types";
-import type { EditedPost, Post, DeletedPost, AddedPost  } from "@/types/post.type";
+import type { Comment, SubComment } from "../types/types";
+import type { EditedPost, Post, DeletedPost, AddedPost, ChangedSelfReaction } from "@/types";
 import { data, comments } from "@/data/data";
-import { addPost, deletePost, editPost, getListPost, getPostsByTagId, getPostsByUserId } from "@/api";
-import { useUsersStore, useAlertStore } from ".";
-import PocketBase from 'pocketbase';
+import { addPost, deletePost, editPost, getListPost, getPostByPostId, getPostsByTagId, getPostsByUserId, increaseLookTime, searchPost } from "@/api";
+import { useUserStore, useAlertStore } from ".";
 
-const pb = new PocketBase('http://127.0.0.1:8090');
-
-const localStoragePosts: unknown =
-  JSON.parse(localStorage.getItem("posts")!);
-
-const handleTypePosts: Post[] | [] = localStoragePosts as Post[] | [];
-
-const localStorageComments: unknown =
-  JSON.parse(localStorage.getItem("comments")!);
-
-const handleTypeComments: Comment[] | [] = localStorageComments as Comment[] | [];
-
-const localStorageCountComment: number =
-  Number(JSON.parse(localStorage.getItem("countComment")!)) || 3;
 
 export const usePostStore = defineStore("posts", {
   state: () => ({
     posts: <Post[] | []>[],
     currentPost: <Post | null>null,
-    comments: <Comment[]>handleTypeComments || comments,
-    countComment: <number>localStorageCountComment,
-    // currentUser: <User/> currentUser,
+    sortMethod: <'byNew' | 'byLike' | 'byComment'>'byNew'
   }),
 
   getters: {
-
-    countTotalPost(state): Number {
-      return state.posts.length;
-    },
-
-    getTotalComment(state): Comment[] | [] {
-      return state.comments;
-    },
-    countTotalComment(state): Number {
-      return state.comments.length;
-    },
-    getCommentById(state) {
-      return (commentId: Number): Comment | undefined => {
-        return state.comments.find((comment) => comment.comment_id === commentId);
-      };
-    },
+    
   },
 
   actions: {
-    savePosts() {
-      localStorage.setItem("posts", JSON.stringify(this.posts));
+
+    async getPostById(postId: number) {
+      const alertStore = useAlertStore();
+      try {
+        const record = await getPostByPostId(postId);
+        const status = record.data.status;
+
+        if (status === 200) {
+          const post = record?.data.data[0];
+          this.currentPost = {
+            postId: post.postId,
+            poster: post.userDTO,
+            createTime: post.createTime,
+            title: post.title,
+            content: post.content,
+            reaction: {
+              like: post.reactionDTO.like,
+              dislike: post.reactionDTO.dislike,
+              total: post.reactionDTO.like - post.reactionDTO.dislike
+            },
+            tags: post.tagName,
+            watchTime: post.watchTime,
+            countComment: post.countComment,
+            reactionId: post.reactionId
+          }
+
+          await this.increaseLookTime(postId);
+
+        } else if (status === 400) {
+          alertStore.error(record?.data.message);
+
+        }
+      } catch (error) {
+
+      }
     },
 
-    async getPostById(postID: string) {
-      const userStore = useUsersStore();
+    async getListPost(pageNo: number, pageSize: number) {
+      const alertStore = useAlertStore();
+      try {
+        const record = await getListPost(pageNo, pageSize);
+        const status = record?.data.status;
 
-      const record = await pb.collection('posts').getOne(postID, {
-        expand: 'relField1,relField2.subRelField',
-      });
-      const user = await userStore.getById(record.poster);
+        if (status === 200) {
+          const posts = record?.data.data;
+          //@ts-ignore
+          this.posts = posts.map(post => ({
+            postId: post.postId,
+            poster: post.userDTO,
+            createTime: post.createTime,
+            title: post.title,
+            content: post.content,
+            reaction: {
+              like: post.reactionDTO.like,
+              dislike: post.reactionDTO.dislike,
+              total: post.reactionDTO.like - post.reactionDTO.dislike
+            },
+            tags: post.tagName,
+            watchTime: post.watchTime,
+            countComment: post.countComment
+          }))
 
-      const reaction = await this.getReaction(record.reaction);
+          this.sortPost(this.sortMethod)
 
+        } else if (status === 400) {
+          alertStore.error(record?.data.message);
 
-      this.currentPost = {
-        post_id: record.id,
-        poster: user,
-        create_time: record.created,
-        title: record.title,
-        content: record.content,
-        views: record.views,
-        comments: record.comments,
-        reaction: reaction,
-        tags: record.tags
+        }
+      } catch (error) {
+
       }
 
     },
 
-    async getReaction(reactionID: string) {
-      return await pb.collection('reaction').getOne(reactionID, {
-        expand: 'relField1,relField2.subRelField',
-      }).then(res => ({ dis_like: res.dis_like, like: res.like, total: res.like - res.dis_like }));
-    },
-
-    async getListPost(pageNo:number, pageSize:number) {
-      const record = await getListPost(pageNo, pageSize);
-    },
-
-    async getAllPost() {
-      const userStore = useUsersStore();
-
-      let posts;
-      const records = await pb.collection('posts').getFullList({
-        sort: '-created',
+    sortPost(method: 'byNew' | 'byLike' | 'byComment') {
+      const newPosts = this.posts.sort((a, b) => {
+        if (method === 'byNew') {
+          let d1 = new Date(a.createTime).getTime();
+          let d2 = new Date(b.createTime).getTime();
+          
+          return d2 -d1 ? -1 : 1;
+        }
+        else if(method === 'byLike') {
+          return b.reaction.total - a.reaction.total;
+        } else {
+          return b.countComment - a.countComment;
+        }
       })
-        .then(res => {
-          posts = res
-        })
-        .catch(err => console.error(err));
 
-      for (let post of posts!) {
-        const user = await userStore.getById(post.poster);
+      this.posts = newPosts;
+    },
 
-        const reaction = await this.getReaction(post.reaction);
+    async getPostsByUserId(userId: number, pageNo: number, pageSize: number) {
 
-        // @ts-ignore
-        this.$state.posts = [...this.$state.posts, {
-          post_id: post.id,
-          poster: user,
-          create_time: post.created,
-          title: post.title,
-          content: post.content,
-          views: post.views,
-          comments: post.comments,
-          reaction: reaction,
-          tags: post.tags
-        }]
+      const alertStore = useAlertStore();
+      try {
+        const record = await getPostsByUserId(userId, pageNo, pageSize);
+        const status = record.data.status;
+
+        if (status === 200) {
+          const posts = record?.data.data;
+          //@ts-ignore
+          this.posts = posts.map(post => ({
+            postId: post.postId,
+            poster: post.userDTO,
+            createTime: post.createTime,
+            title: post.title,
+            content: post.content,
+            reaction: {
+              like: post.reactionDTO.like,
+              dislike: post.reactionDTO.dislike,
+              total: post.reactionDTO.like - post.reactionDTO.dislike
+            },
+            tags: post.tagName,
+            watchTime: post.watchTime,
+            countComment: post.countComment,
+            reactionId: post.reactionId
+          }))
+
+          this.sortPost(this.sortMethod)
+
+        } else if (status === 400) {
+          alertStore.error(record?.data.message);
+
+        }
+
+      } catch (error) {
+
       }
-    },
-
-    async getPostByUserId(userId:number, pageNo:number, pageSize:number) {
-      const record = await getPostsByUserId(userId, pageNo, pageSize);
 
     },
 
-    async getPostByTagId(tagId:number, pageNo:number, pageSizeNumber:number) {
+    async getPostByTagId(tagId: number, pageNo: number, pageSizeNumber: number) {
       const record = await getPostsByTagId(tagId, pageNo, pageSizeNumber);
     },
 
     async addPost(data: AddedPost) {
-      const alertStore = useAlertStore(); 
+      const alertStore = useAlertStore();
       try {
         const record = await addPost(data);
         const status = record?.data.status;
         if (status === 200) {
-          alertStore.success(record?.data.response);
-          
-          await this.getAllPost();
-      } else if (status === 400) {
+          alertStore.success(record?.data.message);
+
+          await this.getListPost(0, 50);
+        } else if (status === 400) {
           alertStore.error(record?.data.message);
 
-      }
+        }
 
       } catch (err) {
         console.error(err);
@@ -151,132 +175,173 @@ export const usePostStore = defineStore("posts", {
     },
 
     async editPost(data: EditedPost) {
-      const record = await editPost(data);
-    },
+      const alertStore = useAlertStore();
+      try {
+        const record = await editPost(data);
+        const status = record.data.status;
 
-    async createReaction(name: string) {
-      const data = {
-        "dis_like": 0,
-        "like": 0,
-        "name": name
-      };
+        if (status === 200) {
+          const post = record?.data.data[0];
+          // this.currentPost = {
+          //   postId: post.postId,
+          //   poster: post.userDTO,
+          //   createTime: post.createTime,
+          //   title: post.title,
+          //   content: post.content,
+          //   reaction: {
+          //     like: post.reactionDTO.like,
+          //     dislike: post.reactionDTO.dislike,
+          //     total: post.reactionDTO.like - post.reactionDTO.dislike
+          //   },
+          //   tags: post.tagName,
+          //   watchTime: post.watchTime,
+          //   countComment: post.countComment
+          // }
+          this.getPostById(post.id)
 
-      const record = await pb.collection('reaction').create(data);
+        } else if (status === 400) {
+          alertStore.error(record?.data.message);
 
-      return record.id
-    },
-    async deletePosts(data: DeletedPost) {
-      const record = await deletePost(data);
+        }
 
-    },
+      } catch (error) {
 
-
-
-    likePost(postId: Number) {
-
-
-      this.savePosts();
-    },
-    dislikePost(postId: Number) {
-      this.posts = this.posts.map((post) => {
-
-        return post;
-      });
-
-      this.savePosts();
-    },
-
-    async searchPost(searchText: string) {
-      const userStore = useUsersStore();
-
-      const resultList = await pb.collection('posts').getList(1, 50, {
-        filter: `title ~'${searchText}'`,
-      });
-      const filterPosts = resultList.items
-      this.posts = [];
-
-      for (let post of filterPosts) {
-        const user = await userStore.getById(post.poster);
-
-        const reaction = await this.getReaction(post.reaction);
-
-        // @ts-ignore
-        this.$state.posts = [...this.$state.posts, {
-          post_id: post.id,
-          poster: user,
-          create_time: post.created,
-          title: post.title,
-          content: post.content,
-          views: post.views,
-          comments: post.comments,
-          reaction: reaction,
-          tags: post.tags
-        }]
       }
-      // this.posts = filterPosts {}
     },
 
-
-
-    saveComments() {
-      localStorage.setItem("comments", JSON.stringify(this.comments));
-    },
-
-    addComments(comment: Comment) {
-      this.comments = [...this.comments, comment];
-
-      this.saveComments();
-    },
-    addSubComments(subComment: SubComment, parentId: number) {
-      const commentId = this.comments.findIndex(comment => {
-
-        return comment.comment_id == parentId;
-      });
-
-      console.log(commentId);
-
-      this.comments[commentId].sub_comments = [...this.comments[commentId].sub_comments, subComment];
-
-      this.saveComments();
-    },
-
-    async deleteComments(commentId: Number) {
-
-    },
-
-    likeComment(commentId: Number) {
-      this.comments = this.comments.map((comment) => {
-        if (comment.comment_id === commentId) {
-
-          comment.reaction.like = Number(comment.reaction.like) + 1;
-          comment.reaction.dislike = Number(comment.reaction.dislike) - 1;
-          comment.reaction.total = Number(comment.reaction.like) - Number(comment.reaction.dislike);
+    async deletePosts(data: DeletedPost) {
+      try {
+        const record = await deletePost(data);
+        const status = record.data.data;
+        if (status === 200) {
+          useRouter().push({ name: 'home' })
         }
-        return comment;
-      });
+      } catch (error) {
+        console.error(error);
 
-      this.saveComments();
+      }
     },
 
-    dislikeComment(commentId: Number) {
-      this.comments = this.comments.map((comment) => {
-        if (comment.comment_id === commentId) {
-          comment.reaction.like = Number(comment.reaction.like) - 1;
-          comment.reaction.dislike = Number(comment.reaction.dislike) + 1;
+    async likePost(data: ChangedSelfReaction) {
+      const userStore = useUserStore();
+      const alertStore = useAlertStore();
+      try {
+        const isLike = userStore.getReaction(true, data.entityId);
+        const record = await userStore.changeReaction(data);
+        const status = record.data.status;
+        if (status === 200) {
+          // handle display number
+          if (isLike === null) {
+            this.currentPost!.reaction.like += 1;
+          }
+          else if (isLike === false) {
+            this.currentPost!.reaction.dislike -= 1;
+            this.currentPost!.reaction.like += 1;
+          } else if (isLike === true) {
+            this.currentPost!.reaction.like -= 1;
+          }
 
-          comment.reaction.total = Number(comment.reaction.like) - Number(comment.reaction.dislike);
+          //handle display color
+          const getReactionRecord = await userStore.getReactions(data.userId);
         }
-        return comment;
-      });
+      } catch (error) {
+        console.error(error);
 
-      this.saveComments();
+      }
+
     },
-    triggerCountComment() {
-      const currentCountComment = this.countComment;
-      this.countComment += 1;
 
-      localStorage.setItem('countComment', JSON.stringify(this.countComment));
-      return currentCountComment;
+    async dislikePost(data: ChangedSelfReaction) {
+      const userStore = useUserStore();
+      const alertStore = useAlertStore();
+      try {
+        const isLike = userStore.getReaction(true, data.entityId);
+        const record = await userStore.changeReaction(data);
+        const status = record.data.status;
+        if (status === 200) {
+          // handle display number
+
+          //idk why false === null
+          if (isLike === false) {
+            console.log('run!');
+            
+            this.currentPost!.reaction.dislike -= 1;
+          }
+          else if (isLike === null) {
+            this.currentPost!.reaction.dislike += 1;
+          } else if (isLike === true) {
+            this.currentPost!.reaction.like -= 1;
+            this.currentPost!.reaction.dislike += 1;
+          }
+
+          //handle display color
+          const getReactionRecord = await userStore.getReactions(data.userId);
+        }
+      } catch (error) {
+        console.error(error);
+
+      }
+
+    },
+
+    async searchPost(keyword: string, pageNo: number, pageSize: number) {
+      const alertStore = useAlertStore();
+      try {
+        const record = await searchPost(keyword, pageNo, pageSize);
+
+        const status = record?.data.status;
+        if (status === 200) {
+          const posts = record?.data.data;
+          console.log(posts);
+          //@ts-ignore
+          this.posts = posts.map(post => ({
+            postId: post.postId,
+            poster: post.userDTO,
+            createTime: post.createTime,
+            title: post.title,
+            content: post.content,
+            reaction: {
+              like: post.reactionDTO.like,
+              dislike: post.reactionDTO.dislike,
+              total: post.reactionDTO.like - post.reactionDTO.dislike
+            },
+            tags: post.tagName,
+            watchTime: post.watchTime,
+            countComment: post.countComment
+          }))
+
+          this.sortPost(this.sortMethod);
+
+        } else if (status === 400) {
+          alertStore.error(record?.data.message);
+
+        }
+
+      } catch (err) {
+        console.error(err);
+
+      }
+
+    },
+
+    async increaseLookTime(postId: number) {
+      const alertStore = useAlertStore();
+      try {
+        const record = await increaseLookTime(postId);
+        const status = record.data.status;
+
+        if (status === 200) {
+          const post = record?.data.data[0];
+          this.currentPost!.watchTime += 1;
+
+        } else if (status === 400) {
+          alertStore.error(record?.data.message);
+
+        }
+
+      } catch (error) {
+
+      }
     }
   },
 });

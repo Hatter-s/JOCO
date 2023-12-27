@@ -73,10 +73,10 @@
 
 <script setup lang="ts">
 import accountAuthImg from "@/assets/image/account-auth.png";
-import { useUsersStore } from "@/stores";
+import { useUserStore } from "@/stores";
 import { storeToRefs } from "pinia";
 
-const userStore = useUsersStore();
+const userStore = useUserStore();
 const { error } = storeToRefs(userStore);
 
 const username = ref<string>('');

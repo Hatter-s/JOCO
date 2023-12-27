@@ -1,7 +1,7 @@
 <template>
     <dialog class="modal" :class="{ 'modal-open': showModal }">
         <div class="modal-box mim-w-[1000px]">
-            <form action="POST" @submit="(e: Event) => {
+            <form action="PUT" @submit="(e: Event) => {
                 handleSubmit(e);
             }">
                 <div class="form-control mb-4">
@@ -49,7 +49,8 @@ import { usePostStore, useAlertStore } from "@/stores";
 import { getFileURL, uploadFile } from "@/api";
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import type { AddedPost, User } from "@/types";
+import type { AddedPost, EditedPost, User } from "@/types";
+import { post } from "node_modules/axios/index.cjs";
 
 const contentModules = {
         name: 'imageUploader',
@@ -83,22 +84,38 @@ const contentModules = {
         }
 }
 
+onMounted(() => {
+    setTimeout(() => {
+        content.value = props.content;
+    }, 1000);
+})
 
 const postStore = usePostStore();
 const alertStore = useAlertStore();
 
-let content = ref();
-let title = ref<string>('');
-let tags = ref<string>('');
-
-let imgAbsPath = ref<string[]>([]);
-let imgBase64 = ref<string[]>([]);
 
 const props = defineProps<{
     handleToggle: any;
     showModal: boolean;
     user: User | null;
+    postId: number,
+    content: string;
+    title: string;
+    tagName: any;
 }>();
+
+let content = ref();
+let title = ref<string>(props.title);
+
+let tags = computed(() => {
+    if(props.tagName) {
+        Object.values(props.tagName)[0]
+    }
+    return ''
+});
+
+let imgAbsPath = ref<string[]>([]);
+let imgBase64 = ref<string[]>([]);
 
 const base64ToAbsPath = (string:string, arrImgBase64:string[], arrImgAbsPath: string[]) => {
     const length:number = arrImgBase64.length;
@@ -106,10 +123,8 @@ const base64ToAbsPath = (string:string, arrImgBase64:string[], arrImgAbsPath: st
     for(let i = 0; i < length; i++) {
         const sliceIndex = string.search(/data:image/);
         const imgBase64Length = arrImgBase64[i].length;
-
-        console.log(string.slice(imgBase64Length + 13));
-        string = string.slice(0, sliceIndex) + arrImgAbsPath[i] + string.slice(imgBase64Length + 13);
-        console.log(string);
+        
+        string = string.slice(0, sliceIndex) + arrImgAbsPath[i] + string.slice(imgBase64Length + 26);
         
     }
 
@@ -126,20 +141,19 @@ let handleSubmit = async (e: Event) => {
         }
 
         content.value = base64ToAbsPath(content.value, imgBase64.value, imgAbsPath.value);
+        console.log(content.value);
         
-        const data: AddedPost = {
+        
+        
+        const data: EditedPost = {
             userId : props.user.id,
-            userName: props.user.username,
-            title: title.value,
-            content: content.value,
-            tags: tags.value
+            postId: props.postId,
+            newTitle: title.value,
+            newContent: content.value,
         };
 
-        await postStore.addPost(data);
+        await postStore.editPost(data);
 
-        content.value = '',
-        title.value = '',
-        tags.value = ''
         props.handleToggle();
     } catch(err) {
         console.error(err);

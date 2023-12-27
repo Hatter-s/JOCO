@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import type { FakeUser } from "../types/types";
 import router from '@/router';
-import {login} from '@/api';
+import {getFileURL, login, updateAvatar} from '@/api';
 import PocketBase from 'pocketbase';
 import { data } from "@/data/data";
 import type { UserLoginData, User } from "@/types";
@@ -11,8 +11,8 @@ const pb = new PocketBase('http://127.0.0.1:8090');
 
 const localStorageUser: unknown = JSON.parse(localStorage.getItem("user")!);
 
-const handleTypeUser: FakeUser | null = localStorageUser as
-  | FakeUser
+const handleTypeUser: User | null = localStorageUser as
+  | User
   | null;
 
 export const useAuthStore = defineStore("auth", {
@@ -58,6 +58,29 @@ export const useAuthStore = defineStore("auth", {
         
         const handleTypeError:Error  = error as Error
         
+      }
+    },
+
+    async updateAvatar(userId: number, formData:FormData) {
+      const alertStore = useAlertStore();
+      try {
+        const record = await updateAvatar(userId, formData);
+        const status = record?.data.status;
+        if (status === 200) {
+          const data = record.data.data;
+          const avatarAddress  = data.avatarAddress;
+          // @ts-ignore
+          this.user = { ...this.user, avatarAddress: avatarAddress }
+          localStorage.setItem('user', JSON.stringify({
+            ...this.user
+          }));
+        } else if (status === 400) {
+          alertStore.error(record?.data.message);
+
+        }
+      } catch (err) {
+        console.error(err);
+
       }
     },
 

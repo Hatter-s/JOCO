@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import accountRouter from './account.router'
+import userRouter from './user.router'
 import { useAuthStore, useAlertStore } from '@/stores'
 
 const router = createRouter({
@@ -17,16 +18,12 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue')
     },
     {
-      path: '/user',
-      name: 'user',
-      component: () => import('../views/UserView.vue')
-    },
-    {
       path: '/post/:id',
       name: 'post',
       component: () => import('../views/PostView.vue')
     },
-    { ...accountRouter }
+    { ...accountRouter },
+    { ...userRouter }
   ],
   scrollBehavior(to, from, savedPosition) {
     // always scroll to top

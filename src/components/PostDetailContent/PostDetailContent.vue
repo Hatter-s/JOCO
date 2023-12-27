@@ -1,29 +1,27 @@
 <template>
     <div class="post-detail-content navbar-spacing" v-if="currentPost">
-        <Post
-            v-if="postStore"
-            position="detail"
-            :post="currentPost!"
-            :likePost="postStore.likePost"
-            :dislikePost="postStore.dislikePost"
-        />
-        <PosterInfo class="poster-info" />
-        <Comments/>
+        <Post v-if="postStore" position="detail" :post="currentPost!" />
+        <PosterInfo class="poster-info" :poster="currentPost.poster" />
+        <Comments :postId="currentPost.postId" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { usePostStore } from '@/stores';
-import { computed, onMounted } from 'vue';
-import { useRoute} from "vue-router";
+import { usePostStore} from '@/stores';
+import { onMounted } from 'vue';
+import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
 const route = useRoute();
 
 onMounted(() => {
-    if(typeof route.params.id === 'string') {
-        postStore.getPostById(route.params.id);
+    if (typeof route.params.id === 'string') {
+        postStore.getPostById(Number(route.params.id));
     }
+})
+
+onBeforeUnmount(() => {
+    currentPost.value = null;
 })
 
 const postStore = usePostStore();

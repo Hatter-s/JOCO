@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import Logo from "@/assets/image/logo.svg";
+import { useAuthStore } from "@/stores";
+
+const authStore = useAuthStore();
+
 </script>
 
 <template>
@@ -21,7 +25,7 @@ import Logo from "@/assets/image/logo.svg";
 					</router-link>
 				</li>
 				<li class="subtitle-text">
-					<router-link :to="{ name: 'user' }" activeClass="link-active" class="sidebar-link">
+					<router-link :to="{ name: 'user', params:{id: authStore.user?.id }}" activeClass="link-active" class="sidebar-link">
 						<div class="sidebar-spacing flex items-center gap-2 py-3">
 							<Chart />
 							Cá nhân

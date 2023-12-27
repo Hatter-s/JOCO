@@ -1,15 +1,16 @@
 import type { User, Reaction } from ".";
 
 export interface Post {
-    post_id: number;
+    postId: number;
     poster: User;
-    create_time: string;
+    createTime: string;
     title: string;
     content: string
     reaction: Reaction;
-    tags: string;
-    views: number;
-    comments: number;
+    tags: any;
+    watchTime: number;
+    countComment: number;
+    reactionId: number
 }
 
 export interface AddedPost {
