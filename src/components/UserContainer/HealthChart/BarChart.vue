@@ -23,20 +23,36 @@ onMounted(() => {
       const response = userStore.getHealthInfoByWeak(user.value.id, props.type).then(res => {
         data.value = res?.data
         labels.value = res?.labels
-        console.log(labels.value);
-
       });
     }
     if (userStore.$state.displayHealthBy === 'month') {
       const response = userStore.getHealthInfoByMonth(user.value.id, props.type).then(res => {
         data.value = res?.data
         labels.value = res?.labels
-        console.log(labels.value);
-
       });
     }
   }
 })
+
+// onUpdated(() => {
+//   if (user.value) {
+//     userStore.getHealthInfo(user.value.id);
+
+//     if (userStore.$state.displayHealthBy === 'weak') {
+//       const response = userStore.getHealthInfoByWeak(user.value.id, props.type).then(res => {
+//         data.value = res?.data
+//         labels.value = res?.labels
+//       });
+//     }
+//     if (userStore.$state.displayHealthBy === 'month') {
+//       const response = userStore.getHealthInfoByMonth(user.value.id, props.type).then(res => {
+//         data.value = res?.data
+//         labels.value = res?.labels
+//       });
+//     }
+//   }
+// })
+
 
 const props = defineProps<{
   type: number

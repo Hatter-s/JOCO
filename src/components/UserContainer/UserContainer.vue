@@ -2,7 +2,8 @@
     <div class="navbar-spacing py-4 flex items-start gap-6">
         <div class="flex-1">
             <div class="flex justify-between gap-12">
-                <ButtonVue class="flex items-center btn-primary text-white flex-1 rounded-md" :handle-click="() => router.push({name: 'user-posts'})">
+                <ButtonVue class="flex items-center btn-primary text-white flex-1 rounded-md"
+                    :handle-click="() => router.push({ name: 'user-posts' })">
                     <PlusCircle />
                     Bài đăng của tôi
                 </ButtonVue>
@@ -13,15 +14,9 @@
             </div>
             <div class="personal_info">
                 <h2 class="text-2xl mt-6 mb-2 font-bold">Thông tin cá nhân</h2>
-                <div class="flex justify-between">
-                    <PersonalInfoBox 
-                        v-for="data in dataBox" 
-                        :title="data.title" 
-                        :content="data.content" 
-                        :unit="data.unit" 
-                        :time="userStore.$state.timeUpdatedHealthInfo"
-                        :type="data.type"
-                    >
+                <div class="flex justify-between gap-10">
+                    <PersonalInfoBox v-for="data in dataBox" :title="data.title" :content="data.content" :unit="data.unit"
+                        :time="userStore.$state.timeUpdatedHealthInfo" :type="data.type" class="flex-1">
                         <template v-slot:icon>
                             <Scale class="icon" />
                         </template>
@@ -30,45 +25,58 @@
             </div>
             <div class="chart">
                 <h2 class="text-2xl mt-6 mb-2 font-bold">Biểu đồ</h2>
-                <div class="flex justify-between gap-6 mb-6">
-                    <div class="flex-1 rounded-md shadow-md p-8 bg-white">
-                        <div class="flex items-center gap-4">
-                            <div class=" p-2 bg-primary text-white rounded-lg">
-                                <Scale class="h-8 w-8" />
+                <div class="flex justify-between gap-10 mb-10 ">
+                    <router-link class="flex-1" :to="{ name: 'user-info', params: { info: 2 } }">
+                        <div class="flex-1 rounded-md shadow-md p-8 bg-white">
+                            <div class="flex items-center gap-4">
+                                <div class=" p-2 bg-primary text-white rounded-lg">
+                                    <Scale class="h-8 w-8" />
+                                </div>
+                                <p class="text-2xl font-medium">Cân nặng</p>
                             </div>
-                            <p class="text-2xl font-medium">Cân nặng</p>
+                            <LineChart :type="2" :key="userHealthInfo?.weight" />
                         </div>
-                        <LineChart :type="2" />
-                    </div>
-                    <div class="flex-1 rounded-md shadow-md p-8 bg-white">
-                        <div class="flex items-center gap-4">
-                            <div class=" p-2 bg-primary text-white rounded-lg">
-                                <BMI class="h-8 w-8" />
+                    </router-link>
+
+                    <router-link class="flex-1" :to="{ name: 'user-info', params: { info: 3 } }">
+                        <div class="rounded-md shadow-md p-8 bg-white">
+                            <div class="flex items-center gap-4">
+                                <div class=" p-2 bg-primary text-white rounded-lg">
+                                    <BMI class="h-8 w-8" />
+                                </div>
+                                <p class="text-2xl font-medium">BMI</p>
                             </div>
-                            <p class="text-2xl font-medium">BMI</p>
+                            <LineChart :type="3" :key="userHealthInfo?.BMI" />
                         </div>
-                        <LineChart :type="3" />
-                    </div>
+                    </router-link>
+
                 </div>
-                <div class="flex justify-between gap-6">
-                    <div class="flex-1 rounded-md shadow-md p-8 bg-white">
-                        <div class="flex items-center gap-4">
-                            <div class=" p-2 bg-primary text-white rounded-lg">
-                                <Sleep class="h-8 w-8" />
+                <div class="flex justify-between gap-10">
+                    <router-link class="flex-1" :to="{ name: 'user-info', params: { info: 4 } }">
+                        <div class="rounded-md shadow-md p-8 bg-white">
+                            <div class="flex items-center gap-4">
+                                <div class=" p-2 bg-primary text-white rounded-lg">
+                                    <Sleep class="h-8 w-8" />
+                                </div>
+                                <p class="text-2xl font-medium">Thời gian ngủ</p>
                             </div>
-                            <p class="text-2xl font-medium">Thời gian ngủ</p>
+                            <BarChart :type="4" :key="userHealthInfo?.sleepTime" />
                         </div>
-                        <BarChart :type="4"  />
-                    </div>
-                    <div class="flex-1 rounded-md shadow-md p-8 bg-white">
-                        <div class="flex items-center gap-4">
-                            <div class=" p-2 bg-primary text-white rounded-lg">
-                                <Flash class="h-8 w-8" />
+                    </router-link>
+
+
+                    <router-link class="flex-1" :to="{ name: 'user-info', params: { info: 5 } }">
+                        <div class="rounded-md shadow-md p-8 bg-white">
+                            <div class="flex items-center gap-4">
+                                <div class=" p-2 bg-primary text-white rounded-lg">
+                                    <Flash class="h-8 w-8" />
+                                </div>
+                                <p class="text-2xl font-medium">Luyện tập</p>
                             </div>
-                            <p class="text-2xl font-medium">Luyện tập</p>
+                            <BarChart :type="5" :key="userHealthInfo?.trainingTime" />
                         </div>
-                        <BarChart :type="5" />
-                    </div>
+                    </router-link>
+
                 </div>
             </div>
         </div>
@@ -79,35 +87,15 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore, useAuthStore } from '@/stores';
-import  { changeNameToType } from '@/utils/handle-health';
+import { useUserStore } from '@/stores';
+import { changeNameToType } from '@/utils/handle-health';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 const router = useRouter();
 
 const userStore = useUserStore();
-const authStore = useAuthStore();
-const { user } = storeToRefs(authStore);
 const { userHealthInfo } = storeToRefs(userStore);
-
-onMounted(() => {
-    // if (user.value) {
-    //     userStore.getHealthInfo(user.value.id);
-    //     const names = ['weight', 'BMI', 'sleepTime', 'trainingTime'];
-    //     names.forEach(async (name) => {
-            
-    //         const type:number = changeNameToType(name);
-    //         // @ts-ignore
-    //         const response = await userStore.getHealthInfoByWeak(user.value.id, type);
-    //         dataChart.value = [...dataChart.value, response]
-            
-    //     })
-    //     console.log(dataChart.value);
-        
-    // } 
-})
-
 
 const dataBox = computed(() => {
     if (userHealthInfo.value) {

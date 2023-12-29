@@ -5,7 +5,6 @@ import { data, comments } from "@/data/data";
 import { addPost, deletePost, editPost, getListPost, getPostByPostId, getPostsByTagId, getPostsByUserId, increaseLookTime, searchPost } from "@/api";
 import { useUserStore, useAlertStore } from ".";
 
-
 export const usePostStore = defineStore("posts", {
   state: () => ({
     posts: <Post[] | []>[],
@@ -24,7 +23,7 @@ export const usePostStore = defineStore("posts", {
       try {
         const record = await getPostByPostId(postId);
         const status = record.data.status;
-
+        
         if (status === 200) {
           const post = record?.data.data[0];
           this.currentPost = {
@@ -179,9 +178,12 @@ export const usePostStore = defineStore("posts", {
       try {
         const record = await editPost(data);
         const status = record.data.status;
-
+        console.log(status === 200);
+        
         if (status === 200) {
-          const post = record?.data.data[0];
+          const post = record?.data.data;
+          console.log(post);
+          
           // this.currentPost = {
           //   postId: post.postId,
           //   poster: post.userDTO,
@@ -197,6 +199,7 @@ export const usePostStore = defineStore("posts", {
           //   watchTime: post.watchTime,
           //   countComment: post.countComment
           // }
+
           this.getPostById(post.id)
 
         } else if (status === 400) {
@@ -212,9 +215,11 @@ export const usePostStore = defineStore("posts", {
     async deletePosts(data: DeletedPost) {
       try {
         const record = await deletePost(data);
-        const status = record.data.data;
+        const status = record.data.status;
+        console.log(status);
+        
         if (status === 200) {
-          useRouter().push({ name: 'home' })
+          location.assign('/');
         }
       } catch (error) {
         console.error(error);

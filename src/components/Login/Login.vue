@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-between items-center bg-[#FAFAFA]">
+    <div class="flex justify-between items-center bg-white">
         <div class="flex-1 flex justify-center">
             <form 
                 action="" 

@@ -26,8 +26,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores";
 import { storeToRefs } from "pinia";
-import { getFileURL, uploadFile } from "@/api";
-import { post } from "node_modules/axios/index.cjs";
+import { getFileURL } from "@/api";
 
 onMounted(() => {
     if (user.value) {

@@ -14,5 +14,8 @@
 </script>
 
 <style scoped>
+    .contain {
+        @apply flex flex-col h-[100vh] bg-white;
+    }
 
 </style>

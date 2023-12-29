@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-between items-center bg-[#FAFAFA]">
+    <div class="flex justify-between items-center bg-white">
         <div class="flex-1 flex justify-center">
             <form action="" class="max-w-[500px] w-full" @submit="(e: Event) => { handleSubmit(e) }">
                 <h1 class="text-4xl mb-8 font-bold">We miss you!</h1>
