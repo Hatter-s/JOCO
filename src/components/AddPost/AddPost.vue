@@ -14,11 +14,8 @@
                     <label for="content">
                         Content
                     </label>
-                    <QuillEditor 
-                    theme="snow" 
-                    toolbar="full" v-model:content="content" contentType="html" 
-                    :modules="contentModules"
-                    />
+                    <QuillEditor theme="snow" toolbar="full" v-model:content="content" contentType="html"
+                        :modules="contentModules" />
                 </div>
 
                 <div class="form-control mb-4">
@@ -51,36 +48,40 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import type { AddedPost, User } from "@/types";
 
+const IMG_URL = import.meta.env.VITE_GET_IMAGE_URL;
+
 const contentModules = {
-        name: 'imageUploader',
-        module: ImageUploader,
-        options: {
-          upload: (file:File) => {
+    name: 'imageUploader',
+    module: ImageUploader,
+    options: {
+        upload: (file: File) => {
             return new Promise((resolve, reject) => {
-              const formData = new FormData();
-              formData.append("file", file);
-                
-            
-              uploadFile(formData)
-              .then(res => {
-                const absPath = res.data.data;
-                imgAbsPath.value = [...imgAbsPath.value, absPath]
-                getFileURL(absPath).then(
-                    res => {
-                        const base64 = 'data:image/png;base64, ' + res.data.data;
-                        imgBase64.value = [...imgBase64.value, base64]
-                        resolve(base64);
-                    }
-                )
-                
-              })
-              .catch(err => {
-                reject("Upload failed");
-                console.error("Error:", err)
-              })
+                const formData = new FormData();
+                formData.append("file", file);
+
+
+                uploadFile(formData)
+                    .then(res => {
+                        // const absPath = res.data.data;
+                        // imgAbsPath.value = [...imgAbsPath.value, absPath]
+                        // getFileURL(absPath).then(
+                        //     res => {
+                        //         console.log(res.data);
+
+                        //         // const base64 = 'data:image/png;base64, ' + res.data.data;
+                        //         // imgBase64.value = [...imgBase64.value, base64]
+                        //     }
+                        // )
+
+                        resolve(IMG_URL + res.data.data);
+                    })
+                    .catch(err => {
+                        reject("Upload failed");
+                        console.error("Error:", err)
+                    })
             })
-          }
         }
+    }
 }
 
 
@@ -100,35 +101,35 @@ const props = defineProps<{
     user: User | null;
 }>();
 
-const base64ToAbsPath = (string:string, arrImgBase64:string[], arrImgAbsPath: string[]) => {
-    const length:number = arrImgBase64.length;
-    
-    for(let i = 0; i < length; i++) {
-        const sliceIndex = string.search(/data:image/);
-        const imgBase64Length = arrImgBase64[i].length;
+// const base64ToAbsPath = (string: string, arrImgBase64: string[], arrImgAbsPath: string[]) => {
+//     const length: number = arrImgBase64.length;
 
-        console.log(string.slice(imgBase64Length + 13));
-        string = string.slice(0, sliceIndex) + arrImgAbsPath[i] + string.slice(imgBase64Length + 13);
-        console.log(string);
-        
-    }
+//     for (let i = 0; i < length; i++) {
+//         const sliceIndex = string.search(/data:image/);
+//         const imgBase64Length = arrImgBase64[i].length;
 
-    return string;
-}
+//         console.log(string.slice(imgBase64Length + 13));
+//         string = string.slice(0, sliceIndex) + arrImgAbsPath[i] + string.slice(imgBase64Length + 13);
+//         console.log(string);
+
+//     }
+
+//     return string;
+// }
 
 
 let handleSubmit = async (e: Event) => {
     try {
         e.preventDefault();
 
-        if(props.user === null) {
+        if (props.user === null) {
             return false;
         }
 
-        content.value = base64ToAbsPath(content.value, imgBase64.value, imgAbsPath.value);
-        
+        // content.value = base64ToAbsPath(content.value, imgBase64.value, imgAbsPath.value);
+
         const data: AddedPost = {
-            userId : props.user.id,
+            userId: props.user.id,
             userName: props.user.username,
             title: title.value,
             content: content.value,
@@ -138,12 +139,12 @@ let handleSubmit = async (e: Event) => {
         await postStore.addPost(data);
 
         content.value = '',
-        title.value = '',
-        tags.value = ''
+            title.value = '',
+            tags.value = ''
         props.handleToggle();
-    } catch(err) {
+    } catch (err) {
         console.error(err);
-        
+
     }
 
 

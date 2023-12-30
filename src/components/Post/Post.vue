@@ -17,23 +17,23 @@ const props = defineProps<{
 }>();
 
 onMounted(() => {
-    getFileURL(props.post.poster.avatarAddress).then(res => posterAvatar.value = 'data:image/png;base64, ' + res.data.data);
+    // getFileURL(props.post.poster.avatarAddress).then(res => posterAvatar.value = 'data:image/png;base64, ' + res.data.data);
 
 
-    if (arrImgAbsPath.value === null) {
-        arrImgBase64.value = [];
-    }
-    else {
-        arrImgAbsPath.value.forEach((absPath) => getFileURL(absPath).then(res => {
+    // if (arrImgAbsPath.value === null) {
+    //     arrImgBase64.value = [];
+    // }
+    // else {
+    //     arrImgAbsPath.value.forEach((absPath) => getFileURL(absPath).then(res => {
 
-            if (arrImgBase64.value === null) {
+    //         if (arrImgBase64.value === null) {
 
-            } else {
-                arrImgBase64.value = [...arrImgBase64.value, ('data:image/png;base64, ' + res.data.data)]
-            }
+    //         } else {
+    //             arrImgBase64.value = [...arrImgBase64.value, ('data:image/png;base64, ' + res.data.data)]
+    //         }
 
-        }))
-    }
+    //     }))
+    // }
 
     if (props.position === "detail") {
         if (user.value?.id !== undefined) {
@@ -82,19 +82,19 @@ const toggleChangeModal = (): void => {
     showChangeModal.value = !showChangeModal.value;
 }
 
-const posterAvatar = ref<string>('');
+// const posterAvatar = ref<string>('');
 
-const arrImgBase64 = ref<string[]>([]);
+// const arrImgBase64 = ref<string[]>([]);
 
 // handle image in content
-const arrImgAbsPath = computed<string[] | null>(() => {
+// const arrImgAbsPath = computed<string[] | null>(() => {
 
-    return props.post.content.match(/(?<=(src="))[^\"]+(?=")/g)
-});
+//     return props.post.content.match(/(?<=(src="))[^\"]+(?=")/g)
+// });
 
-const changeUrlContent = computed(() => {
-    return absPathToBase64(props.post.content, arrImgBase64.value, arrImgAbsPath.value);
-});
+// const changeUrlContent = computed(() => {
+//     return absPathToBase64(props.post.content, arrImgBase64.value, arrImgAbsPath.value);
+// });
 
 const tagName = computed(() => {
     const result = '';
@@ -138,7 +138,7 @@ const tagName = computed(() => {
 
     <!-- change comment modal -->
     <ChangePost :handle-toggle="toggleChangeModal" :show-modal="showChangeModal" :user="authStore.user"
-        :content="changeUrlContent" :title="post.title" :tagName="post.tags" :postId="post.postId" v-if="position === 'detail'" />
+        :content="post.content" :title="post.title" :tagName="post.tags" :postId="post.postId" v-if="position === 'detail'" />
     <div class="post" :class="{ 'mb-4': position === 'in list' }">
         <router-link :to="{ name: 'post', params: { id: post?.postId } }" v-if="position === 'in list'"
             class=" bg-transparent absolute inset-0"></router-link>
@@ -157,7 +157,7 @@ const tagName = computed(() => {
 
         <div class="post-head">
             <div class="poster">
-                <img :src="posterAvatar" alt="poster-image"
+                <img :src="post.poster.avatarAddress" alt="poster-image"
                     class="h-[40px] w-[40px] rounded-full  aspect-square object-cover">
                 <p class="poster-name">
                     {{ post.poster.tagName }}
@@ -169,9 +169,9 @@ const tagName = computed(() => {
         </div>
         <div class="post-body">
             <p class="title">{{ post.title }}</p>
-            <p class="content" v-html="changeUrlContent" v-if="position === 'detail'"></p>
+            <p class="content" v-html="post.content" v-if="position === 'detail'"></p>
             <p class="content" v-if="position === 'in list'">
-                {{ changeUrlContent.slice(3, 20) }}
+                {{ post.content.slice(3, 20) }}
             </p>
         </div>
         <div class="post-foot">

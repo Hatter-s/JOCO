@@ -75,8 +75,7 @@ export const uploadFile = async (formData: FormData) => {
 export const getFileURL = async (path: string) => {
     return await axios({
         method: 'GET',
-        url: UPLOAD_URL,
-        params: { path }
+        url: UPLOAD_URL + '/display' + `/${path}`,
     }).then(res => res);
 }
 

@@ -1,7 +1,7 @@
 <template>
     <div class="bg-white rounded-md shadow-md w-[240px]">
         <div class="relative">
-            <img :src="posterAvatar" alt="poster-img"
+            <img :src="IMG_URL + user?.avatarAddress" alt="poster-img"
                 class="h-[200px] max-w-[200px] object-cover rounded-full p-5 box-content relative left-1/2 -translate-x-1/2">
             <form action="" class="absolute bottom-8 left-1/4 ">
                 <label for="avatar" class="h-8 w-8 bg-primary flex rounded-full justify-center items-center cursor-pointer">
@@ -28,10 +28,12 @@ import { useAuthStore } from "@/stores";
 import { storeToRefs } from "pinia";
 import { getFileURL } from "@/api";
 
+const IMG_URL = import.meta.env.VITE_GET_IMAGE_URL;
+
 onMounted(() => {
-    if (user.value) {
-        getFileURL(user.value.avatarAddress).then(res => posterAvatar.value = 'data:image/png;base64, ' + res.data.data);
-    }
+    // if (user.value) {
+    //     getFileURL(user.value.avatarAddress).then(res => posterAvatar.value = 'data:image/png;base64, ' + res.data.data);
+    // }
 })
 
 const authStore = useAuthStore();
@@ -47,8 +49,11 @@ const handleUpdateAvatar = (e: Event) => {
         formData.append("file", fileList[0]);
         authStore.updateAvatar(user.value!.id, formData)
             .then(res => {
+                
                 if (user.value) {
-                    getFileURL(user.value.avatarAddress).then(res => posterAvatar.value = 'data:image/png;base64, ' + res.data.data);
+                    // getFileURL(user.value.avatarAddress).then(res => posterAvatar.value = 'data:image/png;base64, ' + res.data.data);
+
+                    
                 }
             });
     }

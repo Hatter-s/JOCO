@@ -52,6 +52,8 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import type { AddedPost, EditedPost, User } from "@/types";
 import { post } from "node_modules/axios/index.cjs";
 
+const IMG_URL = import.meta.env.VITE_GET_IMAGE_URL;
+
 const contentModules = {
         name: 'imageUploader',
         module: ImageUploader,
@@ -64,16 +66,16 @@ const contentModules = {
             
               uploadFile(formData)
               .then(res => {
-                const absPath = res.data.data;
-                imgAbsPath.value = [...imgAbsPath.value, absPath]
-                getFileURL(absPath).then(
-                    res => {
-                        const base64 = 'data:image/png;base64, ' + res.data.data;
-                        imgBase64.value = [...imgBase64.value, base64]
-                        resolve(base64);
-                    }
-                )
-                
+                // const absPath = res.data.data;
+                // imgAbsPath.value = [...imgAbsPath.value, absPath]
+                // getFileURL(absPath).then(
+                //     res => {
+                //         const base64 = 'data:image/png;base64, ' + res.data.data;
+                //         imgBase64.value = [...imgBase64.value, base64]
+                //         resolve(base64);
+                //     }
+                // )
+                resolve(IMG_URL + res.data.data);
               })
               .catch(err => {
                 reject("Upload failed");
@@ -114,22 +116,22 @@ let tags = computed(() => {
     return ''
 });
 
-let imgAbsPath = ref<string[]>([]);
-let imgBase64 = ref<string[]>([]);
+// let imgAbsPath = ref<string[]>([]);
+// let imgBase64 = ref<string[]>([]);
 
-const base64ToAbsPath = (string:string, arrImgBase64:string[], arrImgAbsPath: string[]) => {
-    const length:number = arrImgBase64.length;
+// const base64ToAbsPath = (string:string, arrImgBase64:string[], arrImgAbsPath: string[]) => {
+//     const length:number = arrImgBase64.length;
     
-    for(let i = 0; i < length; i++) {
-        const sliceIndex = string.search(/data:image/);
-        const imgBase64Length = arrImgBase64[i].length;
+//     for(let i = 0; i < length; i++) {
+//         const sliceIndex = string.search(/data:image/);
+//         const imgBase64Length = arrImgBase64[i].length;
         
-        string = string.slice(0, sliceIndex) + arrImgAbsPath[i] + string.slice(imgBase64Length + 26);
+//         string = string.slice(0, sliceIndex) + arrImgAbsPath[i] + string.slice(imgBase64Length + 26);
         
-    }
+//     }
 
-    return string;
-}
+//     return string;
+// }
 
 
 let handleSubmit = async (e: Event) => {
@@ -140,8 +142,8 @@ let handleSubmit = async (e: Event) => {
             return false;
         }
 
-        content.value = base64ToAbsPath(content.value, imgBase64.value, imgAbsPath.value);
-        console.log(content.value);
+        // content.value = base64ToAbsPath(content.value, imgBase64.value, imgAbsPath.value);
+        // console.log(content.value);
         
         
         
