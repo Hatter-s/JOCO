@@ -73,6 +73,14 @@ export const changeReaction = async(data: ChangedSelfReaction) => {
     })
 }
 
+export const getAllReaction = async (userId:number) => {
+    return await axios({
+        method: 'GET',
+        url: GET_URL + '/countReaction',
+        params: { userId },
+    })
+}
+
 export const getHealthInfoByWeak = async(userId: number, type: number) => {
     return await axios({
         method: 'GET',

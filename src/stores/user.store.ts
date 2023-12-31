@@ -10,6 +10,7 @@ import type {
 } from "@/types";
 import {
   changeReaction,
+  getAllReaction,
   getHealthInfo,
   getHealthInfoByMonth,
   getHealthInfoByWeak,
@@ -236,6 +237,26 @@ export const useUserStore = defineStore("users", {
       }
     },
 
+    async getAllReaction(userId:number) {
+      const alertStore = useAlertStore();
+
+      try {
+        const record = await getAllReaction(userId);
+
+        const status = record?.data.status;
+        
+        if (status === 200) {
+          console.log(record.data.data);
+          return record.data.data;
+
+          
+        } else if (status === 400) {
+          alertStore.error(record?.data.message);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
     async changeReaction(data: ChangedSelfReaction) {
       return await changeReaction(data);
     },

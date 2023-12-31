@@ -18,24 +18,26 @@
         <hr />
         <p class="flex justify-center gap-2 items-center text-xl py-5 text-primary">
             <Award />
-            125
+            {{ allReaction }}
         </p>
     </div>
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "@/stores";
+import { useAuthStore, useUserStore } from "@/stores";
 import { storeToRefs } from "pinia";
 import { getFileURL } from "@/api";
 
 const IMG_URL = import.meta.env.VITE_GET_IMAGE_URL;
 
 onMounted(() => {
-    // if (user.value) {
+    if (user.value) {
     //     getFileURL(user.value.avatarAddress).then(res => posterAvatar.value = 'data:image/png;base64, ' + res.data.data);
-    // }
+        userStore.getAllReaction(user.value.id).then(res => allReaction.value = res);
+    }
 })
 
+const userStore = useUserStore();
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 
@@ -58,9 +60,9 @@ const handleUpdateAvatar = (e: Event) => {
             });
     }
 }
-const posterAvatar = ref();
 
-const updateAvatar = ref<File>();
+const allReaction = ref(); 
+
 </script>
 
 <style scoped></style>
