@@ -49,7 +49,7 @@
         </div>
 
         <div class="comment-head" v-if="comment.parentId === null">
-            <img :src="commenterAvatar" alt="commenter_img" />
+            <img :src="IMG_URL + comment.userDTO.avatarAddress" alt="commenter_img" />
             <p class="tag-name">
                 {{ comment.userDTO.tagName }}
             </p>
@@ -131,12 +131,13 @@ import { useAuthStore, useCommentStore, useUserStore } from '@/stores';
 
 import { storeToRefs } from 'pinia';
 
-const userStore = useUserStore();
+const IMG_URL = import.meta.env.VITE_GET_IMAGE_URL;
+
 const authStore = useAuthStore();
 const commentStore = useCommentStore();
 const { user } = storeToRefs(authStore);
 onMounted(() => {
-    getFileURL(props.comment.userDTO.avatarAddress).then(res => commenterAvatar.value = 'data:image/png;base64, ' + res.data.data);
+    // getFileURL(props.comment.userDTO.avatarAddress).then(res => commenterAvatar.value = 'data:image/png;base64, ' + res.data.data);
 
 })
 

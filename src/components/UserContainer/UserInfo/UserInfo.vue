@@ -41,7 +41,6 @@ const userStore = useUserStore();
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 
-
 const handleUpdateAvatar = (e: Event) => {
     const target = e.currentTarget as HTMLInputElement;
     let fileList: FileList | null = target.files;

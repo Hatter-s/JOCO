@@ -6,6 +6,8 @@ import { absPathToBase64 } from '@/utils/handle-image';
 import { useAuthStore, usePostStore, useUserStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 
+const IMG_URL = import.meta.env.VITE_GET_IMAGE_URL;
+
 const authStore = useAuthStore();
 const userStore = useUserStore();
 const postStore = usePostStore();
@@ -106,6 +108,7 @@ const tagName = computed(() => {
     return result;
 })
 
+
 // const isLike = computed(() => {
 //     console.log(user.value);
     
@@ -157,7 +160,7 @@ const tagName = computed(() => {
 
         <div class="post-head">
             <div class="poster">
-                <img :src="post.poster.avatarAddress" alt="poster-image"
+                <img :src="IMG_URL + post.poster.avatarAddress" alt="poster-image"
                     class="h-[40px] w-[40px] rounded-full  aspect-square object-cover">
                 <p class="poster-name">
                     {{ post.poster.tagName }}

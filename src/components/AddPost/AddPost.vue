@@ -92,8 +92,8 @@ let content = ref();
 let title = ref<string>('');
 let tags = ref<string>('');
 
-let imgAbsPath = ref<string[]>([]);
-let imgBase64 = ref<string[]>([]);
+// let imgAbsPath = ref<string[]>([]);
+// let imgBase64 = ref<string[]>([]);
 
 const props = defineProps<{
     handleToggle: any;

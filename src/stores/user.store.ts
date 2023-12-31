@@ -247,7 +247,7 @@ export const useUserStore = defineStore("users", {
         
         if (status === 200) {
           console.log(record.data.data);
-          return record.data.data;
+          return record.data.data.like - record.data.data.dislike;
 
           
         } else if (status === 400) {
